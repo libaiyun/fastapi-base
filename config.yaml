@@ -1,0 +1,47 @@
+service_name: fastapi-base
+port: 8150
+environment: development # development, testing, production
+enable_auth: false
+log:
+  app_logfile: ./log/app.log
+  server_logfile: ./log/server.log
+  access_logfile: ./log/access.log
+  scheduler_async_logfile: ./log/scheduler_async.log
+  scheduler_logfile: ./log/scheduler.log
+  rotate_when: MIDNIGHT # S, M, H, D, MIDNIGHT, W
+  backup_count: 30
+mysql:
+  host: 192.168.98.55
+  port: 4000
+  user: dataware_house_testUser
+  password: IlGiUL2qcdqckoIzj6c4
+  database: dataware_house_test
+db:
+  echo: false # 是否打印SQL语句
+  pool_size: 64 # 数据库连接池大小
+  max_overflow: 128 # 连接池的溢出连接数
+  slow_query_threshold: 2.0 # 慢查询的检查阈值（秒）
+gateway:
+  login_url: http://192.168.31.27:8080/auth/login
+  enable_service_register: false
+  service_register_url: http://192.168.31.27:8848/nacos/v2/ns/instance?serviceName={service_name}&groupName=PRODUCTION_CENTRE&namespaceId=public&ephemeral=true
+  service_url: http://192.168.31.27:8080/{service_name}
+nacos:
+  enable_config_sync: false
+  server_address: http://192.168.31.27:8848
+  namespace: public
+  data_id: "{service_name}.yaml"
+  group: PRODUCTION_CENTRE
+redis:
+  url: redis://:www.cqvip.com@192.168.31.163:6379
+  db: 15
+es:
+  host: http://192.168.98.65:9200,http://192.168.98.66:9200,http://192.168.98.67:9200,http://192.168.98.68:9200,http://192.168.98.69:9200,http://192.168.98.70:9200,http://192.168.98.71:9200,http://192.168.98.72:9200
+  user: read_user
+  password: 3W.cqvip.com
+  timeout: 60
+sentry:
+  enabled: false # 是否启用Sentry故障上报和性能监控
+  dsn: http://493b9d47e6bfd3141b86d82d81a64d98@192.168.98.82:9000/3 # 数据源名称，指向Sentry服务项目地址
+  traces_sample_rate: 0.01 # 性能跟踪采样率
+  profiles_sample_rate: 0.05 # 性能分析采样率

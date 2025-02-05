@@ -1,0 +1,33 @@
+# pre-commit的配置文件（https://pre-commit.com/）
+# 使用：
+# 1. pip install pre-commit
+# 2. pre-commit install
+default_stages: [ pre-commit ]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-merge-conflict # 检查是否有未解决的合并冲突
+      - id: check-toml
+      - id: check-yaml
+
+  # 高性能Python代码风格检查和格式化工具Ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.1
+    hooks:
+      - id: ruff
+        args: [ --fix, --show-fixes ]
+      - id: ruff-format
+
+#  # 本地自定义钩子
+#  - repo: local
+#    hooks:
+#      - id: check-migrate
+#        name: check migrate
+#        entry: python scripts/check_migrate/check_migrate.py
+#        language: system
+#        types: [ python ]
+#      - id: check-sensitive-info
+#        name: Check Sensitive Info
+#        entry: sh scripts/check_sensitive_info.sh
+#        language: system
