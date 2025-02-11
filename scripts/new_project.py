@@ -38,11 +38,17 @@ def replace_project_name(dest_dir, old_name, new_name):
                     print(f"替换项目名: {file_path}")
 
 
-def init_git_repo(dest_dir):
+def init_git_repo(dest_dir, remote_url=None):
     """初始化新的 Git 仓库并提交"""
     subprocess.run(["git", "-C", dest_dir, "init"])
     subprocess.run(["git", "-C", dest_dir, "add", "."])
     subprocess.run(["git", "-C", dest_dir, "commit", "-m", "Initial commit"])
+
+    if remote_url:
+        # 关联远程仓库
+        subprocess.run(["git", "-C", dest_dir, "remote", "add", "origin", remote_url])
+        # 推送到远程仓库
+        subprocess.run(["git", "-C", dest_dir, "push", "-u", "origin", "master"])
 
 
 def main():
@@ -57,7 +63,7 @@ def main():
     replace_project_name(dest_dir, "fastapi-base", new_project_name)
 
     print("初始化新的 Git 仓库...")
-    init_git_repo(dest_dir)
+    init_git_repo(dest_dir, remote_url="http://192.168.30.28/libaiyun/test.git")
 
     print("新项目创建完成！")
 
