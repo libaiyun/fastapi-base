@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 
-from sqlalchemy import Column, DateTime, text, Index, Text, JSON
+from sqlalchemy import Column, DateTime, text, Index, Text, JSON, String
 from sqlalchemy.dialects.mysql import TINYINT, BIGINT
 from sqlmodel import SQLModel, Field, Relationship
 
@@ -29,7 +29,7 @@ class Hero(SQLModel, table=True):
     # `parent_id` bigint(20) DEFAULT NULL,
     parent_id: Optional[int] = Field(default=None, sa_column=Column(BIGINT(20)))
     # `name` varchar(100) NOT NULL,
-    name: str = Field(max_length=100)
+    name: str = Field(sa_column=Column(String(100)))
     # `secret_name` varchar(255) NOT NULL,
     secret_name: str
     # `age` int(11) DEFAULT NULL,

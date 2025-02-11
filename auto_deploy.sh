@@ -3,8 +3,8 @@
 
 # 远程仓库地址
 ORIGINAL_REPO_URL="http://192.168.30.28/framework/fastapi-base.git"
-GIT_USER = "cqvipcq%40outlook.com"
-GIT_PASSWD = "Cqvip.com"
+GIT_USER="cqvipcq%40outlook.com"
+GIT_PASSWD="Cqvip.com"
 # 用于部署的分支名
 RELEASE_BRANCH="release/1.0.0"
 # 服务名
