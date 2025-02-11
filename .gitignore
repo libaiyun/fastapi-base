@@ -164,3 +164,4 @@ cython_debug/
 
 cache_config.yaml*
 log/
+*.pid
