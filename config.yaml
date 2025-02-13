@@ -2,6 +2,10 @@ service_name: fastapi-base
 port: 8150
 environment: development # development, testing, production
 enable_auth: false
+uvicorn:
+  workers: 2
+  limit_concurrency: 500
+  limit_max_requests: 10000 # 每个worker重启前最大请求数，null表示不限制
 log:
   app_logfile: ./log/app.log
   server_logfile: ./log/server.log

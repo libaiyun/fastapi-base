@@ -33,6 +33,12 @@ class Environment(str, Enum):
     TESTING = "testing"
 
 
+class UvicornConfig(BaseModel):
+    workers: int
+    limit_concurrency: int
+    limit_max_requests: int
+
+
 class LogConfig(BaseModel):
     app_logfile: str
     server_logfile: str
@@ -112,6 +118,7 @@ class AppConfig(BaseModel):
     environment: Environment
     enable_auth: bool
 
+    uvicorn: UvicornConfig
     log: LogConfig
     mysql: MySQLConfig
     db: DBConfig
