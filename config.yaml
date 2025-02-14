@@ -26,16 +26,17 @@ db:
   max_overflow: 128 # 连接池的溢出连接数
   slow_query_threshold: 2.0 # 慢查询的检查阈值（秒）
 gateway:
-  login_url: http://192.168.31.27:8080/auth/login
-  enable_service_register: false
-  service_register_url: http://192.168.31.27:8848/nacos/v2/ns/instance?serviceName={service_name}&groupName=PRODUCTION_CENTRE&namespaceId=public&ephemeral=true
-  service_url: http://192.168.31.27:8080/{service_name}
+  login_url: http://192.168.31.27:8080/auth/login # 网关登录地址
+  service_url: http://192.168.31.27:8080/{service_name} # 经过网关的当前服务地址
 nacos:
-  enable_config_sync: false
-  server_address: http://192.168.31.27:8848
-  namespace: public
-  data_id: "{service_name}.yaml"
-  group: PRODUCTION_CENTRE
+  server_url: http://192.168.31.27:8848 # Nacos服务端地址
+  auth_enabled: false # Nacos是否已启用鉴权
+  username: content-review # 鉴权用户名
+  password: content-review@cqvip # 鉴权用户密码
+  namespace_id: public # 命名空间ID
+  group: DEFAULT_GROUP # 分组名称
+  enable_service_register: false # 是否启用服务发现注册
+  enable_config_sync: false # 是否启用配置管理同步
 redis:
   url: redis://:www.cqvip.com@192.168.31.163:6379
   db: 15

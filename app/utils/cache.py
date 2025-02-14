@@ -1,4 +1,8 @@
+import asyncio
+import hashlib
+import inspect
 import time
+from collections import OrderedDict
 from functools import lru_cache, wraps
 from threading import Lock
 from typing import Optional, Callable, Any
@@ -85,5 +89,97 @@ def timed_lru_cache(
         wrapper._cache = cache  # 用于测试和调试
 
         return wrapper
+
+    return decorator
+
+
+# 内存缓存存储结构（基于 LRU 淘汰策略）
+class MemoryCache:
+    def __init__(self, maxsize=1024):
+        self._store = OrderedDict()
+        self._lock = asyncio.Lock()  # 协程安全锁
+        self.maxsize = maxsize
+        self.hits = 0
+        self.misses = 0
+
+    async def get(self, key: str) -> Any:
+        async with self._lock:
+            entry = self._store.get(key)
+            if entry:
+                # 检查是否过期
+                if entry["expire"] is None or entry["expire"] > time.monotonic():
+                    self.hits += 1
+                    self._store.move_to_end(key)
+                    return entry["value"]
+                else:
+                    del self._store[key]  # 清理过期缓存
+            self.misses += 1
+            return None
+
+    async def set(self, key: str, value: Any, expire_seconds: Optional[int]) -> None:
+        async with self._lock:
+            current_time = time.monotonic()
+            # 清理过期条目
+            if len(self._store) >= self.maxsize:
+                expired_keys = [k for k, v in self._store.items() if v["expire"] and v["expire"] <= current_time]
+                for k in expired_keys:
+                    del self._store[k]
+            # 淘汰旧条目
+            while len(self._store) >= self.maxsize:
+                self._store.popitem(last=False)
+            expire = current_time + expire_seconds if expire_seconds else None
+            self._store[key] = {"value": value, "expire": expire}
+            self._store.move_to_end(key)
+
+    async def mget(self, keys: list) -> dict:
+        async with self._lock:
+            return {key: await self.get(key) for key in keys}
+
+
+# 全局缓存实例
+cache = MemoryCache()
+
+
+def cached(expire_seconds: Optional[int] = None) -> Callable:
+    """内存缓存装饰器（支持同步/异步函数）"""
+
+    def decorator(func: Callable) -> Callable:
+        is_async = inspect.iscoroutinefunction(func)
+
+        @wraps(func)
+        async def async_wrapper(*args, **kwargs) -> Any:
+            key = _generate_key(func, args, kwargs)
+            cached_value = await cache.get(key)
+            if cached_value is not None:
+                return cached_value
+            result = await func(*args, **kwargs)
+            await cache.set(key, result, expire_seconds)
+            return result
+
+        @wraps(func)
+        def sync_wrapper(*args, **kwargs) -> Any:
+            key = _generate_key(func, args, kwargs)
+            # 同步函数需要特殊处理（示例简化版，实际建议异步优先）
+            # 此处仅演示原理，生产环境建议统一使用异步
+            cached_value = asyncio.run(cache.get(key))
+            if cached_value is not None:
+                return cached_value
+            result = func(*args, **kwargs)
+            asyncio.run(cache.set(key, result, expire_seconds))
+            return result
+
+        def _generate_key(_func: Callable, _args: tuple, _kwargs: dict) -> str:
+            """生成唯一缓存键"""
+            # 使用函数标识和参数生成哈希键
+            key_data = (
+                _func.__module__,
+                _func.__name__,
+                _args,
+                frozenset(_kwargs.items()),
+            )
+            key_str = repr(key_data).encode()
+            return hashlib.sha256(key_str).hexdigest()
+
+        return async_wrapper if is_async else sync_wrapper
 
     return decorator

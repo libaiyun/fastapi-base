@@ -54,7 +54,7 @@ LOGGING_CONFIG: dict[str, Any] = {
         },
     },
     "loggers": {
-        "apps": {"handlers": ["app"], "level": "INFO"},
+        "app": {"handlers": ["app"], "level": "INFO"},
         "uvicorn": {"handlers": ["server"], "level": "INFO"},
         "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
         "scheduler_async": {"handlers": ["scheduler_async"], "level": "INFO"},

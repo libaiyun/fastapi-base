@@ -19,7 +19,7 @@ logger = logging.getLogger("scheduler_async")
 def start_scheduler():
     scheduler = AsyncIOScheduler()
 
-    if config.gateway.enable_service_register:
+    if config.nacos.enable_service_register:
         scheduler.add_job(
             register_service,
             IntervalTrigger(seconds=10),  # 间隔10秒执行

@@ -79,17 +79,18 @@ class DBConfig(BaseModel):
 
 class GatewayConfig(BaseModel):
     login_url: str
-    enable_service_register: bool
-    service_register_url: str
     service_url: str
 
 
 class NacosConfig(BaseModel):
-    enable_config_sync: bool
-    server_address: str
-    namespace: str
-    data_id: str
+    server_url: str
+    auth_enabled: bool
+    username: str
+    password: str
+    namespace_id: str
     group: str
+    enable_service_register: bool
+    enable_config_sync: bool
 
 
 class RedisConfig(BaseModel):
@@ -133,9 +134,7 @@ class AppConfig(BaseModel):
         if self.environment != Environment.PRODUCTION:
             self.service_name = f"{self.service_name}-{self.environment}"
         service_name = self.service_name.replace("_", "-")  # nacos服务地址不允许下划线
-        self.gateway.service_register_url = self.gateway.service_register_url.format(service_name=service_name)
-        self.gateway.service_url = self.gateway.service_url.format(service_name=service_name)
-        self.nacos.data_id = self.nacos.data_id.format(service_name=service_name)
+        self.gateway.service_url = self.gateway.service_url.replace("{service_name}", service_name)
         return self
 
     @classmethod

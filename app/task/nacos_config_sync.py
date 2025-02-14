@@ -1,13 +1,15 @@
 import asyncio
 import logging
 import os
+from urllib.parse import urljoin
 
 import aiohttp
 import yaml
 
+from app.utils.nacos_auth import get_token
 from config import config, CACHE_CONFIG_FILE, CONFIG_FILE
 
-logger = logging.getLogger("scheduler_async")
+logger = logging.getLogger(__name__)
 TIMEOUT = aiohttp.ClientTimeout(total=60)
 
 
@@ -16,22 +18,24 @@ class NacosConfigNotExist(Exception):
 
 
 class NacosConfigSync:
-    def __init__(self, server_address: str, namespace: str, data_id: str, group: str):
-        self.server_address = server_address
-        self.namespace = namespace
-        self.data_id = data_id
-        self.group = group
+    def __init__(self):
+        self.config_url = urljoin(config.nacos.server_url, "/nacos/v2/cs/config")
+
+    async def build_common_params(self):
+        params = {
+            "namespaceId": config.nacos.namespace_id,
+            "group": config.nacos.group,
+            "dataId": f"{config.service_name}.yaml",
+        }
+        if config.nacos.auth_enabled:
+            params["accessToken"] = await get_token()
+        return params
 
     async def fetch_config(self):
         """从 Nacos 获取配置"""
-        api = "/nacos/v2/cs/config"
-        params = {
-            "namespaceId": self.namespace,
-            "group": self.group,
-            "dataId": self.data_id,
-        }
+        params = await self.build_common_params()
         async with aiohttp.ClientSession(timeout=TIMEOUT) as session:
-            async with session.get(self.server_address + api, params=params) as resp:
+            async with session.get(self.config_url, params=params) as resp:
                 try:
                     result = await resp.json()
                 except Exception:
@@ -45,16 +49,14 @@ class NacosConfigSync:
 
     async def publish_config(self, content: str):
         """将配置发布到 Nacos"""
-        api = "/nacos/v2/cs/config"
+        common_params = await self.build_common_params()
         params = {
-            "namespaceId": self.namespace,
-            "group": self.group,
-            "dataId": self.data_id,
+            **common_params,
             "content": content,
             "type": "yaml",
         }
         async with aiohttp.ClientSession(timeout=TIMEOUT) as session:
-            async with session.post(self.server_address + api, data=params) as resp:
+            async with session.post(self.config_url, data=params) as resp:
                 try:
                     result = await resp.json()
                 except Exception:
@@ -64,8 +66,7 @@ class NacosConfigSync:
                 # print(result)
                 return result["data"]
 
-    @staticmethod
-    def save_to_local(config_content: str, cache_file: str):
+    def save(self, config_content: str, cache_file: str):
         """保存配置到本地缓存文件，并进行版本备份"""
         if os.path.exists(cache_file):
             for i in range(1, 20):  # 最多保留19个历史版本
@@ -85,18 +86,13 @@ class NacosConfigSync:
             if old_config == new_config:
                 logger.info("配置未变更，无需保存")
                 return False
-        self.save_to_local(new_content, cache_file)
+        self.save(new_content, cache_file)
         return True
 
 
 async def sync_nacos_config():
     """同步 Nacos 配置"""
-    nacos_sync = NacosConfigSync(
-        server_address=config.nacos.server_address,
-        namespace=config.nacos.namespace,
-        data_id=config.nacos.data_id,
-        group=config.nacos.group,
-    )
+    nacos_sync = NacosConfigSync()
     try:
         new_content = await nacos_sync.fetch_config()
         if nacos_sync.compare_and_save(CACHE_CONFIG_FILE, new_content):
@@ -109,8 +105,4 @@ async def sync_nacos_config():
 
 
 if __name__ == "__main__":
-    import logging.config
-    from app.core.log import LOGGING_CONFIG
-
-    logging.config.dictConfig(LOGGING_CONFIG)
     asyncio.run(sync_nacos_config())
