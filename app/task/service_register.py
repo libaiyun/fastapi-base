@@ -12,7 +12,7 @@ TIMEOUT = aiohttp.ClientTimeout(total=60)
 
 async def register_service():
     """服务发现注册"""
-    params = {"serviceName": config.service_name, "ip": config.host, "port": config.port}
+    params = {"serviceName": config.service_name, "ip": config.host, "port": config.port, "ephemeral": "true"}
     if config.nacos.auth_enabled:
         params["accessToken"] = await get_token()
     service_register_api = "/nacos/v2/ns/instance"
