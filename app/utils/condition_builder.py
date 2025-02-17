@@ -38,12 +38,12 @@ class ConditionBuilder:
                 return field_attr.like(f"%{cond.value}%")
 
     def process_conditions(
-        self, conditions: List[Union[Condition, LogicCondition]], expr
+            self, conditions: List[Union[Condition, LogicCondition]], expr
     ) -> Optional[ColumnElement[bool]]:
         clauses = []
         for sub_cond in conditions:
             if isinstance(sub_cond, LogicCondition):
-                if clause := self.build_condition(sub_cond) is not None:
+                if (clause := self.build_condition(sub_cond)) is not None:
                     clauses.append(clause)
             elif isinstance(sub_cond, Condition):
                 clauses.append(self.build_single_condition(sub_cond))
