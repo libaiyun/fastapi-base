@@ -17,6 +17,7 @@ python-multipart==0.0.20
 apscheduler==3.10.4
 #uvloop==0.21.0 # 仅支持linux
 supervisor==4.2.5
+fastapi-cache2[memcache]==0.2.2 # [redis] / [dynamodb]
 # dev
 pytest==8.3.4
 pytest-asyncio==0.25.2
