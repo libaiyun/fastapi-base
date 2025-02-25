@@ -1,3 +1,6 @@
+from typing import Optional
+
+from fastapi import Header
 from fastapi.security import OAuth2PasswordBearer
 
 from app.core.db import session_factory
@@ -19,3 +22,9 @@ async def api_lock(lock_key: str, timeout: int = 60):
     lock_key = f"{config.environment}_lock:{lock_key}"
     async with redis_cli.lock(lock_key, timeout=timeout):
         yield
+
+
+async def get_signature(
+        authorization: Optional[str] = Header(None),
+):
+    """OpenAPI全局请求头声明"""

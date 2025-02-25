@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from app.api.deps import oauth2_scheme
+from app.api.deps import oauth2_scheme, get_signature
 from app.core.log import LOGGING_CONFIG
 from app.core.middleware import register_middlewares
 from app.exceptions import register_exception_handlers, ServerException
@@ -27,7 +27,7 @@ app = FastAPI(
     ]
     if config.enable_auth
     else None,
-    dependencies=[Depends(oauth2_scheme)] if config.enable_auth else None,
+    dependencies=[Depends(oauth2_scheme), Depends(get_signature)] if config.enable_auth else None,
 )
 
 make_api_offline(app)
