@@ -45,6 +45,7 @@ class LogConfig(BaseModel):
     access_logfile: str
     scheduler_async_logfile: str
     scheduler_logfile: str
+    task_logfile: str
     rotate_when: Literal["S", "M", "H", "D", "MIDNIGHT", "W"]
     backup_count: int
 
@@ -54,6 +55,7 @@ class LogConfig(BaseModel):
         "access_logfile",
         "scheduler_async_logfile",
         "scheduler_logfile",
+        "task_logfile",
         mode="before",
     )
     def ensure_log_path_exists(cls, v):
