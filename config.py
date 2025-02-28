@@ -28,9 +28,9 @@ def get_local_ip(prefix: str = "") -> str | None:
 
 
 class Environment(str, Enum):
-    DEVELOPMENT = "development"
-    PRODUCTION = "production"
-    TESTING = "testing"
+    DEVELOPMENT = "dev"
+    PRODUCTION = "prod"
+    TESTING = "test"
 
 
 class UvicornConfig(BaseModel):

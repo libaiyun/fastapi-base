@@ -1,6 +1,6 @@
 service_name: fastapi-base
 port: 8150
-environment: development # development, testing, production
+environment: dev # dev, test, prod
 enable_auth: false
 uvicorn:
   workers: 2
