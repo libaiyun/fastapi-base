@@ -1,9 +1,12 @@
 import aioredis
 
+from app.exceptions import ConfigError
 from config import config
 
 
 def make_redis():
+    if config.redis is None:
+        raise ConfigError("Redis连接未配置")
     client = aioredis.from_url(
         config.redis.url,
         db=config.redis.db,

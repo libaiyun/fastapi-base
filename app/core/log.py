@@ -44,21 +44,18 @@ LOGGING_CONFIG: dict[str, Any] = {
             **_DEFAULT_FILE_HANDLER,
             "filename": config.log.access_logfile,
         },
-        "scheduler_async": {
+        "task": {
             **_DEFAULT_FILE_HANDLER,
-            "filename": config.log.scheduler_async_logfile,
-        },
-        "scheduler": {
-            **_DEFAULT_FILE_HANDLER,
-            "filename": config.log.scheduler_logfile,
+            "filename": config.log.task_logfile,
         },
     },
     "loggers": {
         "app": {"handlers": ["app"], "level": "INFO"},
+        "app.task": {"handlers": ["task"], "level": "INFO", "propagate": False},
         "uvicorn": {"handlers": ["server"], "level": "INFO"},
         "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
-        "scheduler_async": {"handlers": ["scheduler_async"], "level": "INFO"},
-        "scheduler": {"handlers": ["scheduler"], "level": "INFO"},
+        "scheduler_async": {"handlers": ["console"], "level": "INFO"},
+        "scheduler": {"handlers": ["console"], "level": "INFO"},
     },
 }
 

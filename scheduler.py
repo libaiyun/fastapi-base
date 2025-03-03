@@ -9,7 +9,7 @@ from app.core.log import LOGGING_CONFIG
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
-logger = logging.getLogger("scheduler")
+logger = logging.getLogger(__name__)
 
 """同步任务定时调度，默认多进程并发以利用多核cpu能力，适合计算密集型任务。"""
 

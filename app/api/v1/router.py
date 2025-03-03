@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.v1.routes import hero
+# from app.api.v1.routes import hero
 
 router = APIRouter()
 
-router.include_router(hero.router, prefix="/hero", tags=["英雄人物"])
+# router.include_router(hero.router, prefix="/hero", tags=["英雄人物"])

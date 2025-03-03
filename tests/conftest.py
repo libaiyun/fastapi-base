@@ -4,7 +4,7 @@ from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.api.deps import get_session
+from app.api.deps.session import get_session
 from app.core.db import ASYNC_DATABASE_URL
 from app.main import app
 from config import config

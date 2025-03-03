@@ -23,6 +23,10 @@ class RequestParamError(ClientError):
     pass
 
 
+class ConfigError(ServerException):
+    pass
+
+
 def register_exception_handlers(app: FastAPI):
     @app.exception_handler(ClientError)
     async def client_error_handler(request: Request, exc: "ClientError"):
