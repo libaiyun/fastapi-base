@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 def start_scheduler():
     scheduler = AsyncIOScheduler()
 
-    if config.nacos.enable_service_register:
+    if config.nacos and config.nacos.enable_service_register:
         scheduler.add_job(
             register_service,
             IntervalTrigger(seconds=10),  # 间隔10秒执行
@@ -28,7 +28,7 @@ def start_scheduler():
             coalesce=True,  # 合并错过的执行
         )
 
-    if config.nacos.enable_config_sync:
+    if config.nacos and config.nacos.enable_config_sync:
         scheduler.add_job(
             sync_nacos_config,
             IntervalTrigger(seconds=15),  # 间隔10秒执行

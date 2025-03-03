@@ -4,7 +4,7 @@ import socket
 import traceback
 from enum import Enum
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Optional
 
 import yaml
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -115,24 +115,25 @@ class AppConfig(BaseModel):
     host: str = Field(default_factory=lambda: get_local_ip("192.168"))
     port: int
     environment: Environment
-    enable_auth: bool
+    enable_auth: bool = False
 
     uvicorn: UvicornConfig
     log: LogConfig
-    mysql: MySQLConfig
-    db: DBConfig
-    gateway: GatewayConfig
-    nacos: NacosConfig
-    redis: RedisConfig
-    es: ESConfig
-    sentry: SentryConfig
+    mysql: Optional[MySQLConfig] = None
+    db: Optional[DBConfig] = None
+    gateway: Optional[GatewayConfig] = None
+    nacos: Optional[NacosConfig] = None
+    redis: Optional[RedisConfig] = None
+    es: Optional[ESConfig] = None
+    sentry: Optional[SentryConfig] = None
 
     @model_validator(mode="after")
     def format_service_name(self) -> Self:
         if self.environment != Environment.PRODUCTION:
             self.service_name = f"{self.service_name}-{self.environment}"
-        service_name = self.service_name.replace("_", "-")  # nacos服务地址不允许下划线
-        self.gateway.service_url = self.gateway.service_url.replace("{service_name}", service_name)
+        if self.gateway:
+            service_name = self.service_name.replace("_", "-")  # nacos服务地址不允许下划线
+            self.gateway.service_url = self.gateway.service_url.replace("{service_name}", service_name)
         return self
 
     @classmethod

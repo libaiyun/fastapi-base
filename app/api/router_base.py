@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.api.deps import get_session
+from app.api.deps.session import get_session
 from app.schemas.pagination import Paged
 from app.schemas.query import CommonQuery, ComplexQuery
 from app.schemas.response import APIResponse

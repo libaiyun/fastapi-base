@@ -8,9 +8,13 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.exceptions import ConfigError
 from config import config
 
 logger = logging.getLogger(__name__)
+
+if config.mysql is None or config.db is None:
+    raise ConfigError("MySQL或数据库连接未配置")
 
 DATABASE_URL = "mysql+pymysql://{}:{}@{}:{}/{}".format(
     parse.quote(config.mysql.user),
