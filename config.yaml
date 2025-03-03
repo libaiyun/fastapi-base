@@ -10,8 +10,6 @@ log:
   app_logfile: ./log/app.log
   server_logfile: ./log/server.log
   access_logfile: ./log/access.log
-  scheduler_async_logfile: ./log/scheduler_async.log
-  scheduler_logfile: ./log/scheduler.log
   task_logfile: ./log/task.log
   rotate_when: MIDNIGHT # S, M, H, D, MIDNIGHT, W
   backup_count: 30

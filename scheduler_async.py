@@ -11,7 +11,7 @@ from config import config
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
-logger = logging.getLogger("scheduler_async")
+logger = logging.getLogger(__name__)
 
 """异步任务定时调度，基于asyncio，适合I/O密集型任务。"""
 

@@ -43,8 +43,6 @@ class LogConfig(BaseModel):
     app_logfile: str
     server_logfile: str
     access_logfile: str
-    scheduler_async_logfile: str
-    scheduler_logfile: str
     task_logfile: str
     rotate_when: Literal["S", "M", "H", "D", "MIDNIGHT", "W"]
     backup_count: int
@@ -53,8 +51,6 @@ class LogConfig(BaseModel):
         "app_logfile",
         "server_logfile",
         "access_logfile",
-        "scheduler_async_logfile",
-        "scheduler_logfile",
         "task_logfile",
         mode="before",
     )
