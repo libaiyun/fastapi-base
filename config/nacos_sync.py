@@ -55,5 +55,5 @@ class ConfigSyncer:
             except NacosConfigNotExist:
                 logger.info("Nacos配置不存在, 正在发布默认配置...")
                 # content = yaml.dump(self.config.model_dump(mode="json"), sort_keys=False)
-                data = await client.publish_config("")
+                data = await client.publish_config(yaml.dump(self.config.model_dump(include={"project_name"})))
                 logger.info(f"配置发布成功: {data}")
