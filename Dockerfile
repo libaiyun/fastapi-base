@@ -20,7 +20,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt && \
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir uvloop==0.21.0
 
 HEALTHCHECK --interval=30s --timeout=10s \
