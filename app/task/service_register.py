@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from urllib.parse import urljoin
 
@@ -26,3 +27,18 @@ async def register_service():
             # response.raise_for_status()
             result = await response.text()
             logger.info(f"Service registration result: {result}")
+
+
+async def periodic_register(interval: int = 10):
+    """定时服务注册"""
+    while True:
+        if not config.nacos.enable_service_register:
+            await asyncio.sleep(30)
+            continue
+        try:
+            await register_service()
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"Service registration failed: {e}", exc_info=True)
+        await asyncio.sleep(interval)

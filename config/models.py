@@ -68,6 +68,7 @@ class NacosConfig(BaseModel):
     enable_service_register: bool = False
     enable_config_sync: bool = False
     sync_interval: int = 15
+    heartbeat_interval: int = 10
 
 
 class GatewayConfig(BaseModel):

@@ -18,7 +18,7 @@ LOGGING_CONFIG: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "simple": {"format": "%(levelname)s [%(asctime)s] %(message)s"},
+        "simple": {"format": "%(levelname)s [%(asctime)s] [%(name)s] %(message)s"},
         "verbose": {
             "format": "%(levelname)s [%(asctime)s] %(pathname)s "
             "%(lineno)d %(funcName)s %(process)d %(thread)d "
@@ -51,12 +51,23 @@ LOGGING_CONFIG: dict[str, Any] = {
         },
     },
     "loggers": {
-        "app": {"handlers": ["app"], "level": "INFO"},
-        "app.task": {"handlers": ["task"], "level": "INFO", "propagate": False},
+        "app": {
+            "handlers": [
+                "app",
+            ],
+            "level": "INFO",
+        },
+        "config": {"handlers": ["app"], "level": "INFO"},
+        "app.task": {
+            "handlers": [
+                "task",
+            ],
+            "level": "INFO",
+            "propagate": False,
+        },
         "uvicorn": {"handlers": ["server"], "level": "INFO"},
         "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
-        "scheduler_async": {"handlers": ["console"], "level": "INFO"},
-        "scheduler": {"handlers": ["console"], "level": "INFO"},
+        "__main__": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
 

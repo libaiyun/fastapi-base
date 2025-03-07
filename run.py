@@ -1,11 +1,18 @@
 import asyncio
+import logging.config
 
 import uvicorn
 
-from config import config
+from app.core.log import LOGGING_CONFIG
+from app.task.service_register import periodic_register
+from config import config, config_syncer
+
+logging.config.dictConfig(LOGGING_CONFIG)
 
 
 async def main():
+    config_syncer.start()
+
     server = uvicorn.Server(
         uvicorn.Config(
             "app.main:app",
@@ -18,7 +25,16 @@ async def main():
             limit_max_requests=config.server.limit_max_requests,  # 每个进程处理 n 个请求后重启
         )
     )
-    await server.serve()
+    service_register_task = asyncio.create_task(periodic_register(config.nacos.heartbeat_interval))
+    try:
+        await server.serve()
+    finally:
+        await config_syncer.stop()
+        service_register_task.cancel()
+        try:
+            await service_register_task
+        except asyncio.CancelledError:
+            pass
 
 
 if __name__ == "__main__":

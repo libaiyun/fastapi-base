@@ -34,6 +34,7 @@ nacos:
   enable_service_register: false # 是否启用服务发现注册
   enable_config_sync: false # 是否启用配置管理同步
   sync_interval: 15 # 配置同步间隔（秒）
+  heartbeat_interval: 10 # 服务发现注册心跳间隔（秒）
 gateway:
   login_url: http://192.168.31.27:8080/auth/login # 网关登录地址
   service_url: http://192.168.31.27:8080/{service_name} # 经过网关的当前服务地址
