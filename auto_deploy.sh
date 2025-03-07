@@ -74,12 +74,6 @@ if [ -z "$SERVER_HOST" ]; then
     send_notification "⚠️ 部署失败：无法获取服务IP"
     exit 1
 fi
-# 启动容器前检查端口占用
-if check_port_used "${SERVER_PORT}"; then
-    log "错误：宿主机端口 ${SERVER_PORT} 已被占用"
-    send_notification "⚠️ 部署失败：端口 ${SERVER_PORT} 冲突"
-    exit 1
-fi
 
 # 切换到工作目录
 cd "$WORK_DIR" || { log "无法进入目录 $WORK_DIR"; exit 1; }
@@ -128,6 +122,12 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     # 清理旧容器
     docker rm -f "$PROJECT_NAME" 2>/dev/null && log "旧容器已移除"
 
+    # 启动容器前检查端口占用
+    if check_port_used "${SERVER_PORT}"; then
+        log "错误：宿主机端口 ${SERVER_PORT} 已被占用"
+        send_notification "⚠️ 部署失败：端口 ${SERVER_PORT} 冲突"
+        exit 1
+    fi
     # 启动新容器
     log "启动新版本容器..."
     docker run -d \
@@ -161,3 +161,4 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 else
     log "当前已是最新版本，无需部署"
 fi
+
