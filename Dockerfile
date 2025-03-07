@@ -4,6 +4,11 @@ ENV TZ=Asia/Shanghai \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
+# Debian 12 DEB822格式
+RUN sed -i \
+    's/deb.debian.org/mirrors.ustc.edu.cn/g' \
+    /etc/apt/sources.list.d/debian.sources
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     tzdata \
