@@ -56,6 +56,13 @@ async def health_check():
     return {"status": "healthy"}
 
 
+if config.debug:
+
+    @app.get("/config_info")
+    async def get_config_info():
+        return config.model_dump(mode="json")
+
+
 if config.enable_auth:
 
     @app.post("/token", response_model=Token)
