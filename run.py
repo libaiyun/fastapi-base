@@ -27,7 +27,7 @@ async def main():
     )
     service_register_task = asyncio.create_task(periodic_register(config.nacos.heartbeat_interval))
     try:
-        await server.serve()
+        await server.serve()  # 单进程模式，workers 参数被忽略
     finally:
         await config_syncer.stop()
         service_register_task.cancel()
