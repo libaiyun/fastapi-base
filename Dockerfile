@@ -20,9 +20,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir uvloop==0.21.0
+RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn && \
+    pip install --no-cache-dir uvloop==0.21.0 -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
 
 HEALTHCHECK --interval=30s --timeout=10s \
   CMD supervisorctl -c /app/supervisord.conf status | \
