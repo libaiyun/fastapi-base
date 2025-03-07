@@ -46,6 +46,14 @@ OPENAPI_URL="http://192.168.98.79:8150/docs"
 # 远程仓库地址（带用户名和密码）
 REPO_URL="http://${GIT_USER}:${GIT_PASSWD}@${ORIGINAL_REPO_URL#http://}"
 
+# 脚本开头添加锁机制
+LOCK_FILE="/tmp/${PROJECT_NAME}.lock"
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+    log "已有其他部署进程运行，退出"
+    exit 0
+fi
+
 set -e  # 一旦发生错误，脚本将退出
 
 if [ -z "$SERVER_HOST" ]; then
