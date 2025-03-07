@@ -25,6 +25,19 @@ send_notification() {
         }' || log "发送通知失败"
 }
 
+# 检查端口是否被占用
+check_port_used() {
+    local port=$1
+    if command -v ss >/dev/null 2>&1; then
+        ss -tuln | grep -q ":$port "
+    elif command -v netstat >/dev/null 2>&1; then
+        netstat -tuln | grep -q ":$port "
+    else
+        log "错误：需要安装 ss 或 netstat 来检查端口占用"
+        exit 1
+    fi
+}
+
 # 远程仓库地址
 ORIGINAL_REPO_URL="http://192.168.30.28/framework/fastapi-base.git"
 GIT_USER="cqvipcq%40outlook.com"
@@ -62,7 +75,7 @@ if [ -z "$SERVER_HOST" ]; then
     exit 1
 fi
 # 启动容器前检查端口占用
-if ss -tuln | grep -q ":${SERVER_PORT} "; then
+if check_port_used "${SERVER_PORT}"; then
     log "错误：宿主机端口 ${SERVER_PORT} 已被占用"
     send_notification "⚠️ 部署失败：端口 ${SERVER_PORT} 冲突"
     exit 1
