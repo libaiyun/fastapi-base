@@ -51,22 +51,11 @@ LOGGING_CONFIG: dict[str, Any] = {
         },
     },
     "loggers": {
-        "app": {
-            "handlers": [
-                "app",
-            ],
-            "level": "INFO",
-        },
-        "config": {"handlers": ["app"], "level": "INFO"},
-        "app.task": {
-            "handlers": [
-                "task",
-            ],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "uvicorn": {"handlers": ["server"], "level": "INFO"},
-        "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+        "app": {"handlers": ["app", "console"], "level": "INFO"},
+        "config": {"handlers": ["app", "console"], "level": "INFO"},
+        "app.task": {"handlers": ["task", "console"], "level": "INFO", "propagate": False},
+        "uvicorn": {"handlers": ["server", "console"], "level": "INFO"},
+        "uvicorn.access": {"handlers": ["access", "console"], "level": "INFO", "propagate": False},
         "__main__": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
