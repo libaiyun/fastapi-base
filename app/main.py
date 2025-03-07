@@ -15,7 +15,7 @@ from app.core.make_api_offline import make_api_offline
 from app.api.v1.router import router as api_v1
 from app.schemas.error_report import ErrorReport
 from app.schemas.token import Token
-from config import config
+from config import config, APP_ENV
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
@@ -25,7 +25,7 @@ app = FastAPI(
     servers=[
         {"url": config.gateway.service_url, "description": "Production environment"},
     ]
-    if config.enable_auth and config.gateway
+    if config.enable_auth
     else None,
     dependencies=[Depends(oauth2_scheme), Depends(get_signature)] if config.enable_auth else None,
 )
@@ -35,12 +35,12 @@ make_api_offline(app)
 register_middlewares(app)
 register_exception_handlers(app)
 
-if config.sentry and config.sentry.enabled:
+if config.sentry.enabled:
     sentry_sdk.init(
         dsn=config.sentry.dsn,
         traces_sample_rate=config.sentry.traces_sample_rate,
         profiles_sample_rate=config.sentry.profiles_sample_rate,
-        environment=config.environment,
+        environment=APP_ENV,
     )
 
 app.include_router(api_v1, prefix="/api/v1")
@@ -56,7 +56,7 @@ async def health_check():
     return {"status": "healthy"}
 
 
-if config.enable_auth and config.gateway:
+if config.enable_auth:
 
     @app.post("/token", response_model=Token)
     async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -71,7 +71,7 @@ if config.enable_auth and config.gateway:
         return {"access_token": access_token, "token_type": "bearer"}
 
 
-if config.sentry and config.sentry.enabled:
+if config.sentry.enabled:
 
     @app.post("/errors/report")
     async def report_error(error_report: ErrorReport, request: Request):

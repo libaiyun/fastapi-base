@@ -140,6 +140,7 @@ class MemoryCache:
 cache = MemoryCache()
 
 
+# TODO: 缓存方法时，不应该使用self的内存地址计算key
 def cached(expire_seconds: Optional[int] = None) -> Callable:
     """内存缓存装饰器（支持同步/异步函数）"""
 

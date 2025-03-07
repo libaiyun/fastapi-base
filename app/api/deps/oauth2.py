@@ -5,7 +5,9 @@ from fastapi.security import OAuth2PasswordBearer
 
 from config import config
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"http://{config.host}:{config.port}/token", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl=f"http://{config.server.host}:{config.server.port}/token", auto_error=False
+)
 
 
 async def get_signature(

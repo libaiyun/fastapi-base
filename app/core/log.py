@@ -1,6 +1,7 @@
 from typing import Any
 
-from config import config, Environment
+from config import config, APP_ENV
+from config.models import AppEnv
 
 _DEFAULT_FILE_HANDLER = {
     "formatter": "simple",
@@ -59,6 +60,6 @@ LOGGING_CONFIG: dict[str, Any] = {
     },
 }
 
-if config.environment == Environment.DEVELOPMENT:
+if APP_ENV == AppEnv.DEV:
     for _logger in LOGGING_CONFIG["loggers"]:
         LOGGING_CONFIG["loggers"][_logger]["handlers"] = ["console"]

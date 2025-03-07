@@ -5,7 +5,6 @@ from typing import Sequence, List
 
 from elasticsearch import AsyncElasticsearch
 
-from app.exceptions import ConfigError
 from config import config
 
 logger = logging.getLogger(__name__)
@@ -16,8 +15,6 @@ def get_es() -> AsyncElasticsearch:
     """
     获取ES连接对象
     """
-    if config.es is None:
-        raise ConfigError("ES连接未配置")
     es = AsyncElasticsearch(
         hosts=config.es.host.split(","),
         # ca_certs=ca_path,  # E:\application-service\apps\s105-c7es-01.crt

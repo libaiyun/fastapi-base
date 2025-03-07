@@ -5,7 +5,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.log import LOGGING_CONFIG
-from app.task.nacos_config_sync import sync_nacos_config
 from app.task.service_register import register_service
 from config import config
 
@@ -19,19 +18,10 @@ logger = logging.getLogger(__name__)
 def start_scheduler():
     scheduler = AsyncIOScheduler()
 
-    if config.nacos and config.nacos.enable_service_register:
+    if config.nacos.enable_service_register:
         scheduler.add_job(
             register_service,
             IntervalTrigger(seconds=10),  # 间隔10秒执行
-            max_instances=1,  # 允许同时运行的最大实例数
-            misfire_grace_time=30,  # 如果错过了执行时间，最多延迟30秒执行
-            coalesce=True,  # 合并错过的执行
-        )
-
-    if config.nacos and config.nacos.enable_config_sync:
-        scheduler.add_job(
-            sync_nacos_config,
-            IntervalTrigger(seconds=15),  # 间隔10秒执行
             max_instances=1,  # 允许同时运行的最大实例数
             misfire_grace_time=30,  # 如果错过了执行时间，最多延迟30秒执行
             coalesce=True,  # 合并错过的执行
