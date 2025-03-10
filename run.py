@@ -43,6 +43,7 @@ if __name__ == "__main__":
         sw_config.init(
             agent_collector_backend_services=config.sw.agent_collector_backend_services,
             agent_name=config.namespace,
+            # TODO: 自定义agent_instance_name避免应用重启后实例名不同
             agent_log_reporter_active=config.sw.agent_log_reporter_active,
             agent_log_reporter_level=config.sw.agent_log_reporter_level,
             agent_meter_reporter_active=config.sw.agent_meter_reporter_active,
