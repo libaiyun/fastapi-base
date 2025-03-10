@@ -48,7 +48,7 @@ class ConfigSyncer:
         """从Nacos同步配置"""
         async with NacosClient(self.config.nacos, self.config.service_name) as client:
             try:
-                logger.info("正在从Nacos同步配置...")
+                # logger.info("正在从Nacos同步配置...")
                 content = await client.fetch_config()
                 self.config.__init__(**yaml.safe_load(content))
                 logger.info("配置同步成功")
