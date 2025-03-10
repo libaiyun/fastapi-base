@@ -50,7 +50,7 @@ PROJECT_NAME="fastapi-base"
 WORK_DIR="/data/projects/$PROJECT_NAME"
 SERVER_HOST=$(get_local_ip "192.168")
 SERVER_PORT="8150"
-DOCKER_IMAGE="${PROJECT_NAME}:1.0.0"
+#DOCKER_IMAGE="${PROJECT_NAME}:1.0.0"
 CONFIG_FILE="config-prod.yaml"
 # 企微群机器人通知webhook地址
 QY_NOTIFY_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=013547da-3d78-4a7f-b4a7-e668b192c293"
@@ -110,6 +110,9 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
         log "创建默认配置文件..."
         touch "$CONFIG_FILE"
     }
+
+    REMOTE_COMMIT_SHORT=$(git rev-parse --short "origin/$RELEASE_BRANCH")
+    DOCKER_IMAGE="${PROJECT_NAME}:${REMOTE_COMMIT_SHORT}-$(date +%Y%m%d%H%M)"
 
     # 构建Docker镜像
     log "开始构建容器镜像..."
