@@ -52,3 +52,9 @@ sentry:
   dsn: http://493b9d47e6bfd3141b86d82d81a64d98@192.168.98.82:9000/3 # 数据源名称，指向Sentry服务项目地址
   traces_sample_rate: 1 # 性能跟踪采样率
   profiles_sample_rate: 0.05 # 性能分析采样率
+sw:
+  enabled: false  # 是否启用SkyWalking应用性能监控探针
+  agent_collector_backend_services: 192.168.98.83:11800 # SkyWalking OAP 服务器地址
+  agent_log_reporter_active: true # 是否启用日志关联追踪功能
+  agent_log_reporter_level: WARNING # 日志上报级别: INFO, WARNING, ERROR
+  agent_meter_reporter_active: true # 是否启用性能指标(Metrics)上报

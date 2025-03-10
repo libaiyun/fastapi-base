@@ -2,6 +2,7 @@ import asyncio
 import logging.config
 
 import uvicorn
+from skywalking import agent, config as sw_config
 
 from app.core.log import LOGGING_CONFIG
 from app.task.service_register import periodic_register
@@ -38,4 +39,13 @@ async def main():
 
 
 if __name__ == "__main__":
+    if config.sw.enabled:
+        sw_config.init(
+            agent_collector_backend_services=config.sw.agent_collector_backend_services,
+            agent_name=config.namespace,
+            agent_log_reporter_active=config.sw.agent_log_reporter_active,
+            agent_log_reporter_level=config.sw.agent_log_reporter_level,
+            agent_meter_reporter_active=config.sw.agent_meter_reporter_active,
+        )
+        agent.start()
     asyncio.run(main())

@@ -95,6 +95,15 @@ class SentryConfig(BaseModel):
     profiles_sample_rate: float = 0.05
 
 
+class SkyWalkingConfig(BaseModel):
+    # https://skywalking.apache.org/docs/skywalking-python/latest/en/setup/cli/
+    enabled: bool = False
+    agent_collector_backend_services: str
+    agent_log_reporter_active: bool = True
+    agent_log_reporter_level: str = "WARNING"
+    agent_meter_reporter_active: bool = True
+
+
 class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter="_",  # 嵌套模型环境变量分隔符，如MYSQL_HOST
@@ -118,6 +127,7 @@ class AppConfig(BaseSettings):
     redis: RedisConfig
     es: ESConfig
     sentry: SentryConfig
+    sw: SkyWalkingConfig
 
     @classmethod
     def settings_customise_sources(
