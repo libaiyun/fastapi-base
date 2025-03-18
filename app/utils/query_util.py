@@ -5,7 +5,7 @@ from sqlalchemy import ColumnElement
 from sqlalchemy.orm import Relationship
 from sqlmodel import SQLModel, func
 
-from app.exceptions import RequestParamError
+from app.exceptions import ParamValidationError
 from app.schemas.query import CommonQuery, TEMP_QUERY_FIELDS, SortOrder
 from app.utils.string_util import split_comma_separated
 
@@ -26,11 +26,11 @@ def build_conditions(model: Type[SQLModel], query_params: Dict[str, Any] = None)
             continue
         match = PATTERN.match(field)
         if not match:
-            raise RequestParamError(f"字段不存在或不支持的查询条件: {field}")
+            raise ParamValidationError(f"字段不存在或不支持的查询条件: {field}")
         field_name = match.group("field")
         op = match.group("op")
         if not hasattr(model, field_name):
-            raise RequestParamError(f"字段不存在: {field}")
+            raise ParamValidationError(f"字段不存在: {field}")
         field_attr = getattr(model, field_name)
         match op:
             case "in":
@@ -67,7 +67,7 @@ def format_sort(model: Type[SQLModel], sort_by: str, sort_order: SortOrder) -> l
     for field in sort_fields:
         column = getattr(model, field, None)
         if not column:
-            raise ValueError(f"Invalid sort_by field: {field}")
+            raise ParamValidationError(f"Invalid sort_by field: {field}")
         if sort_order is SortOrder.DESC:
             column = column.desc()
         sort_columns.append(column)

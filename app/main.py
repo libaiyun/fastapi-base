@@ -10,7 +10,7 @@ from starlette.responses import JSONResponse
 from app.api.deps.oauth2 import oauth2_scheme, get_signature
 from app.core.log import LOGGING_CONFIG
 from app.core.middleware import register_middlewares
-from app.exceptions import register_exception_handlers, ServerException
+from app.exceptions import register_exception_handlers, RemoteServiceException
 from app.core.make_api_offline import make_api_offline
 from app.api.v1.router import router as api_v1
 from app.schemas.error_report import ErrorReport
@@ -114,4 +114,4 @@ if config.sentry.enabled:
 
         except Exception as e:
             logger.exception("Error while reporting to Sentry")
-            raise ServerException(f"Failed to report error: {str(e)}")
+            raise RemoteServiceException(f"Failed to report error: {str(e)}")

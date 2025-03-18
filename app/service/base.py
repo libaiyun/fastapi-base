@@ -5,7 +5,7 @@ from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.crud.base import CRUDBase
-from app.exceptions import OperationError
+from app.exceptions import ResourceNotFound
 from app.schemas.pagination import Paged
 from app.schemas.query import CommonQuery, ComplexQuery
 from app.utils.model_util import get_primary_keys, get_relationship_fields
@@ -31,7 +31,7 @@ class BaseService(Generic[T]):
             ident = pk
         db_item = await session.get(self.model, ident)
         if not db_item:
-            raise OperationError("更新目标不存在")
+            raise ResourceNotFound("更新目标不存在")
         db_item = await self.do_update(session, db_item, obj_new)
         return db_item
 

@@ -3,7 +3,7 @@ from typing import Type, List, Union, Optional
 from sqlalchemy import ColumnElement
 from sqlmodel import SQLModel, func, and_, or_
 
-from app.exceptions import RequestParamError
+from app.exceptions import ParamValidationError
 from app.schemas.query import Condition, Operator, LogicCondition
 
 
@@ -13,7 +13,7 @@ class ConditionBuilder:
 
     def build_single_condition(self, cond: Condition):
         if not hasattr(self.model, cond.field):
-            raise RequestParamError(f"查询条件中的字段 `{cond.field}` 不存在")
+            raise ParamValidationError(f"查询条件中的字段 `{cond.field}` 不存在")
         field_attr = getattr(self.model, cond.field)
         match cond.operator:
             case Operator.EQ:
@@ -38,7 +38,7 @@ class ConditionBuilder:
                 return field_attr.like(f"%{cond.value}%")
 
     def process_conditions(
-            self, conditions: List[Union[Condition, LogicCondition]], expr
+        self, conditions: List[Union[Condition, LogicCondition]], expr
     ) -> Optional[ColumnElement[bool]]:
         clauses = []
         for sub_cond in conditions:
