@@ -116,7 +116,7 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     # 构建Docker镜像
     log "开始构建容器镜像..."
-    docker build -t "$DOCKER_IMAGE" . || {
+    DOCKER_BUILDKIT=1 docker build -t "$DOCKER_IMAGE" . || {
         log "镜像构建失败";
         send_notification "容器镜像构建失败！\n请检查构建日志"
         exit 1

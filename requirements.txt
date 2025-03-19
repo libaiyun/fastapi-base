@@ -15,7 +15,7 @@ elasticsearch[async]~=8.11.1
 sentry-sdk==2.20.0
 python-multipart==0.0.20
 apscheduler==3.10.4
-#uvloop==0.21.0 # 仅支持linux
+uvloop==0.21.0; sys_platform == 'linux'
 supervisor==4.2.5
 fastapi-cache2[memcache]==0.2.2 # [redis] / [dynamodb]
 pydantic-settings==2.8.1

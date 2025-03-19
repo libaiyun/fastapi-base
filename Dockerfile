@@ -11,9 +11,9 @@ RUN sed -i \
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    tzdata \
+    curl \
     vim \
-    curl && \
+    tzdata && \
     # 配置时区
     ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone && \
@@ -23,10 +23,13 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-COPY . .
+# 优先安装依赖以利用缓存
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
 
-RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn && \
-    pip install --no-cache-dir uvloop==0.21.0 -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
+# 复制应用代码
+COPY . .
 
 HEALTHCHECK --interval=30s --timeout=10s \
   CMD supervisorctl -c /app/supervisord.conf status | \
