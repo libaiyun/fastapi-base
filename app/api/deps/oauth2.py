@@ -11,6 +11,12 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 async def get_signature(
+    cqvip_appid: Optional[str] = Header(None),
+    cqvip_ts: Optional[str] = Header(None),
+    cqvip_sign: Optional[str] = Header(None),
+    cqvip_type: Optional[str] = Header(None),
+    sign_path: Optional[str] = Header(None),
     authorization: Optional[str] = Header(None),
+    user_id: Optional[str] = Header(None),
 ):
     """OpenAPI全局请求头声明"""

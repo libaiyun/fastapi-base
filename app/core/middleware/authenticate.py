@@ -4,10 +4,22 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.constants import AUTH_WHITELIST
-from app.context import user_id_context
+from app.context import user_id_context, appid_context
 from app.utils.auth_util import get_userinfo
 
 logger = logging.getLogger(__name__)
+
+
+async def set_authinfo(request: Request, call_next):
+    appid = request.headers.get("cqvip-appid")
+    if appid is not None:
+        appid_context.set(appid)
+    user_id = request.headers.get("user-id")
+    if user_id is not None:
+        user_id_context.set(user_id)
+
+    response = await call_next(request)
+    return response
 
 
 async def authenticate(request: Request, call_next):
