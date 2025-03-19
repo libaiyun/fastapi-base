@@ -1,7 +1,7 @@
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Literal
+from typing import Optional, Literal, Any, Dict
 
 from pydantic import BaseModel, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
@@ -21,6 +21,24 @@ def get_app_env() -> AppEnv:
 
 
 APP_ENV = get_app_env()
+
+
+def expand_env_vars(data: Any) -> Any:
+    """递归解析环境变量"""
+    if isinstance(data, dict):
+        return {k: expand_env_vars(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [expand_env_vars(item) for item in data]
+    elif isinstance(data, str):
+        return os.path.expandvars(data)  # 支持 $VAR 和 ${VAR} 格式
+    else:
+        return data
+
+
+class CustomYamlConfigSettingsSource(YamlConfigSettingsSource):
+    def __call__(self) -> Dict[str, Any]:
+        yaml_data = super().__call__()
+        return expand_env_vars(yaml_data)  # 应用环境变量解析
 
 
 class ServerConfig(BaseModel):
@@ -150,7 +168,7 @@ class AppConfig(BaseSettings):
         return (
             init_settings,
             env_settings,
-            YamlConfigSettingsSource(settings_cls),
+            CustomYamlConfigSettingsSource(settings_cls),
             dotenv_settings,
             file_secret_settings,
         )
