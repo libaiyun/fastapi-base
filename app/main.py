@@ -28,6 +28,7 @@ app = FastAPI(
     if config.enable_auth
     else None,
     dependencies=[Depends(oauth2_scheme), Depends(get_signature)] if config.enable_auth else None,
+    root_path=f"/{config.service_name}",
 )
 
 make_api_offline(app)
