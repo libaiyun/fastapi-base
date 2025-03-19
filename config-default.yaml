@@ -48,6 +48,9 @@ es:
   user: elastic
   password: elastic
   timeout: 60
+mongo:
+  uri: mongodb://192.168.0.1:27017/?authSource=admin
+  db: test_db
 sentry:
   enabled: false # 是否启用Sentry故障上报和性能监控
   dsn: http://493b9d47e6bfd3141b86d82d81a64d98@192.168.98.82:9000/3 # 数据源名称，指向Sentry服务项目地址

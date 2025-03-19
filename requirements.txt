@@ -21,6 +21,8 @@ fastapi-cache2[memcache]==0.2.2 # [redis] / [dynamodb]
 pydantic-settings==2.8.1
 apache-skywalking==1.1.0
 cryptography==44.0.2
+motor==3.7.0
+beanie==1.29.0
 # dev
 pytest==8.3.4
 pytest-asyncio==0.25.2

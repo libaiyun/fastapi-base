@@ -88,6 +88,11 @@ class ESConfig(BaseModel):
     timeout: int = 60
 
 
+class MongoDBConfig(BaseModel):
+    uri: str
+    db: str
+
+
 class SentryConfig(BaseModel):
     enabled: bool = False
     dsn: str
@@ -127,6 +132,7 @@ class AppConfig(BaseSettings):
     gateway: GatewayConfig
     redis: RedisConfig
     es: ESConfig
+    mongo: MongoDBConfig
     sentry: SentryConfig
     sw: SkyWalkingConfig
 
