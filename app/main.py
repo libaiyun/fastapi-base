@@ -1,4 +1,5 @@
 import logging.config
+from contextlib import asynccontextmanager
 
 import aiohttp
 import sentry_sdk
@@ -21,13 +22,30 @@ logging.config.dictConfig(LOGGING_CONFIG)
 
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        yield
+    finally:
+        pass
+
+
+servers = None
+dependencies = [
+    Depends(get_signature),
+]
+if config.enable_auth:
+    servers = [{"url": config.gateway.service_url, "description": "正式环境"}]
+    dependencies.append(Depends(oauth2_scheme))
 app = FastAPI(
-    servers=[
-        {"url": config.gateway.service_url, "description": "Production environment"},
-    ]
-    if config.enable_auth
-    else None,
-    dependencies=[Depends(oauth2_scheme), Depends(get_signature)] if config.enable_auth else None,
+    title="基于FastAPI的Python服务基础框架",
+    description="基于FastAPI的Python服务基础框架，"
+    "包含ORM、日志管理、任务调度、服务发现注册、统一配置管理、CI/CD、单元测试等通用设计。",
+    version="1.0.0",
+    servers=servers,
+    dependencies=dependencies,
+    lifespan=lifespan,
     root_path=f"/{config.service_name}",
 )
 
