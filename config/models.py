@@ -6,6 +6,8 @@ from typing import Optional, Literal
 from pydantic import BaseModel, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
 
+APP_PATH = Path(__file__).parent.parent
+
 
 class AppEnv(str, Enum):
     DEV = "dev"
@@ -113,7 +115,7 @@ class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_nested_delimiter="_",  # 嵌套模型环境变量分隔符，如MYSQL_HOST
         # env_file=(".env", f".env.{APP_ENV}"),
-        yaml_file=("config-default.yaml", f"config-{APP_ENV}.yaml"),
+        yaml_file=(APP_PATH / "config-default.yaml", APP_PATH / f"config-{APP_ENV}.yaml"),
         yaml_file_encoding="utf-8",
         case_sensitive=False,  # 大小写不敏感
         nested_model_default_partial_update=True,  # 允许嵌套模型部分更新
