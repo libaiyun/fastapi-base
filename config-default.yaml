@@ -1,6 +1,7 @@
 project_name: fastapi-base # 项目名称
 enable_auth: false
 debug: false
+encryption_key: "DjCJN9dz5SjSd1e7BBMvy2f9_XdVuqfJGY7CTVLoQBI="
 server:
   host: 192.168.20.73 # 服务部署的主机IP
   port: 8150 # 服务端口

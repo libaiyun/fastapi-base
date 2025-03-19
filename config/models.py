@@ -117,6 +117,7 @@ class AppConfig(BaseSettings):
     project_name: str
     enable_auth: bool = False
     debug: bool = False
+    encryption_key: str
 
     server: ServerConfig
     log: LogConfig

@@ -20,7 +20,9 @@ supervisor==4.2.5
 fastapi-cache2[memcache]==0.2.2 # [redis] / [dynamodb]
 pydantic-settings==2.8.1
 apache-skywalking==1.1.0
+cryptography==44.0.2
 # dev
 pytest==8.3.4
 pytest-asyncio==0.25.2
 httpx==0.28.1
+ipython==8.34.0
