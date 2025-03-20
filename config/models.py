@@ -86,6 +86,15 @@ class NacosConfig(BaseModel):
     enable_discovery: bool = False
     enable_config: bool = False
 
+    @field_validator("server_url", mode="after")
+    def format_server_url(cls, v: str):
+        server_url = v.strip()
+        if not server_url.startswith(("http://", "https://")):
+            server_url = f"http://{server_url}"
+        if ":" not in server_url.split("//", 1)[-1]:
+            server_url += ":8848"
+        return server_url
+
 
 class GatewayConfig(BaseModel):
     login_url: str
