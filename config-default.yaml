@@ -3,16 +3,13 @@ enable_auth: false
 debug: false
 encryption_key: "DjCJN9dz5SjSd1e7BBMvy2f9_XdVuqfJGY7CTVLoQBI="
 server:
-  host: 192.168.20.73 # 服务部署的主机IP
+  host: $SERVER_HOST # 服务部署的主机IP
   port: 8150 # 服务端口
   workers: 1 # 服务器并发进程数
   limit_concurrency: 200 # 每个worker并发请求数上限
   limit_max_requests: # 每个worker重启前最大请求数，null表示不限制
 log:
-  app_logfile: log/app.log # 应用日志
-  server_logfile: log/server.log # Web服务器日志
-  access_logfile: log/access.log # 访问日志
-  task_logfile: log/task.log # 独立任务日志
+  #log_dir: /app/log
   rotate_when: MIDNIGHT # 日志轮转时机: S, M, H, D, MIDNIGHT, W
   backup_count: 30 # 日志文件保留个数
 mysql:

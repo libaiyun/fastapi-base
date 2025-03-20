@@ -6,7 +6,7 @@ from config.models import AppEnv
 _DEFAULT_FILE_HANDLER = {
     "formatter": "simple",
     "class": "concurrent_log_handler.ConcurrentTimedRotatingFileHandler",
-    "filename": config.log.app_logfile,
+    "filename": config.log.log_dir / "app.log",
     "when": config.log.rotate_when,
     "interval": 1,
     "backupCount": config.log.backup_count,
@@ -39,15 +39,15 @@ LOGGING_CONFIG: dict[str, Any] = {
         },
         "server": {
             **_DEFAULT_FILE_HANDLER,
-            "filename": config.log.server_logfile,
+            "filename": config.log.log_dir / "server.log",
         },
         "access": {
             **_DEFAULT_FILE_HANDLER,
-            "filename": config.log.access_logfile,
+            "filename": config.log.log_dir / "access.log",
         },
         "task": {
             **_DEFAULT_FILE_HANDLER,
-            "filename": config.log.task_logfile,
+            "filename": config.log.log_dir / "task.log",
         },
     },
     "loggers": {

@@ -50,16 +50,13 @@ class ServerConfig(BaseModel):
 
 
 class LogConfig(BaseModel):
-    app_logfile: str = "log/app.log"
-    server_logfile: str = "log/server.log"
-    access_logfile: str = "log/access.log"
-    task_logfile: str = "log/task.log"
+    log_dir: Path = APP_PATH / "log"
     rotate_when: Literal["S", "M", "H", "D", "MIDNIGHT", "W"] = "MIDNIGHT"
     backup_count: int = 30
 
-    @field_validator("app_logfile", "server_logfile", "access_logfile", "task_logfile", mode="before")
+    @field_validator("log_dir", mode="before")
     def ensure_log_path_exists(cls, v):
-        Path(v).parent.mkdir(parents=True, exist_ok=True)
+        Path(v).mkdir(parents=True, exist_ok=True)
         return v
 
 
