@@ -23,6 +23,7 @@ apache-skywalking==1.1.0
 cryptography==44.0.2
 motor==3.7.0
 beanie==1.29.0
+# https://github.com/nacos-group/nacos-sdk-python/pull/221
 git+https://githubfast.com/libaiyun/nacos-sdk-python.git@2.0.1-custom
 # dev
 pytest==8.3.4
