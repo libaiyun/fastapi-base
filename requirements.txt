@@ -23,7 +23,7 @@ apache-skywalking==1.1.0
 cryptography==44.0.2
 motor==3.7.0
 beanie==1.29.0
-nacos-sdk-python==2.0.1
+git+https://githubfast.com/libaiyun/nacos-sdk-python.git@2.0.1-custom
 # dev
 pytest==8.3.4
 pytest-asyncio==0.25.2
