@@ -13,6 +13,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl \
     vim \
+    git \
     tzdata && \
     # 配置时区
     ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && \
