@@ -51,6 +51,7 @@ class ServerConfig(BaseModel):
 
 class LogConfig(BaseModel):
     log_dir: Path = APP_PATH / "log"
+    log_dir.mkdir(parents=True, exist_ok=True)
     rotate_when: Literal["S", "M", "H", "D", "MIDNIGHT", "W"] = "MIDNIGHT"
     backup_count: int = 30
 

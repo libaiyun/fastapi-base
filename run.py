@@ -12,8 +12,8 @@ logging.config.dictConfig(LOGGING_CONFIG)
 
 
 async def main():
-    await config_syncer.start()
     service_discovery = ServiceDiscovery(config)
+    await service_discovery.start()
     await config_syncer.start()
 
     server = uvicorn.Server(
@@ -31,6 +31,8 @@ async def main():
 
     try:
         await server.serve()  # 单进程模式，workers 参数被忽略
+    except KeyboardInterrupt:
+        pass
     finally:
         await service_discovery.stop()
         await config_syncer.stop()
