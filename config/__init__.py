@@ -1,5 +1,5 @@
 from config.models import APP_ENV, AppConfig
-from config.nacos_sync import ConfigSyncer
+from config.sync import ConfigSyncer
 
 config = AppConfig()
 

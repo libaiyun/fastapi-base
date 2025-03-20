@@ -29,8 +29,8 @@ def scheduler_test2():
 def start_scheduler():
     scheduler = BlockingScheduler(executors={"default": ProcessPoolExecutor(os.cpu_count())})
 
-    scheduler.add_job(scheduler_test, "interval", seconds=10)
-    scheduler.add_job(scheduler_test2, "interval", seconds=10)
+    # scheduler.add_job(scheduler_test, "interval", seconds=10)
+    # scheduler.add_job(scheduler_test2, "interval", seconds=10)
     try:
         scheduler.start()
     except (KeyboardInterrupt, SystemExit):

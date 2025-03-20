@@ -22,7 +22,7 @@ async def set_authinfo(request: Request, call_next):
     return response
 
 
-async def authenticate(request: Request, call_next):
+async def authenticate_oauth2(request: Request, call_next):
     if request.url.path in AUTH_WHITELIST:
         response = await call_next(request)
         return response

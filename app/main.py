@@ -35,7 +35,7 @@ servers = None
 dependencies = [
     Depends(get_signature),
 ]
-if config.enable_auth:
+if config.enable_oauth2:
     servers = [{"url": config.gateway.service_url, "description": "正式环境"}]
     dependencies.append(Depends(oauth2_scheme))
 app = FastAPI(
@@ -82,7 +82,7 @@ if config.debug:
         return config.model_dump(mode="json")
 
 
-if config.enable_auth:
+if config.enable_oauth2:
 
     @app.post("/token", response_model=Token)
     async def login(form_data: OAuth2PasswordRequestForm = Depends()):

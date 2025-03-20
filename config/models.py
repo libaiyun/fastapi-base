@@ -82,10 +82,8 @@ class NacosConfig(BaseModel):
     password: str = ""
     namespace_id: str = "public"
     group: str = "DEFAULT_GROUP"
-    enable_service_register: bool = False
-    enable_config_sync: bool = False
-    sync_interval: int = 15
-    heartbeat_interval: int = 10
+    enable_discovery: bool = False
+    enable_config: bool = False
 
 
 class GatewayConfig(BaseModel):
@@ -137,8 +135,8 @@ class AppConfig(BaseSettings):
     )
 
     project_name: str
-    enable_auth: bool = False
     debug: bool = False
+    enable_oauth2: bool = False
     encryption_key: str
 
     server: ServerConfig

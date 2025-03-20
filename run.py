@@ -5,14 +5,16 @@ import uvicorn
 from skywalking import agent, config as sw_config
 
 from app.core.log import LOGGING_CONFIG
-from app.task.service_register import periodic_register
+from app.core.service_discovery import ServiceDiscovery
 from config import config, config_syncer
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
 
 async def main():
-    config_syncer.start()
+    await config_syncer.start()
+    service_discovery = ServiceDiscovery(config)
+    await config_syncer.start()
 
     server = uvicorn.Server(
         uvicorn.Config(
@@ -26,16 +28,12 @@ async def main():
             limit_max_requests=config.server.limit_max_requests,  # 每个进程处理 n 个请求后重启
         )
     )
-    service_register_task = asyncio.create_task(periodic_register(config.nacos.heartbeat_interval))
+
     try:
         await server.serve()  # 单进程模式，workers 参数被忽略
     finally:
+        await service_discovery.stop()
         await config_syncer.stop()
-        service_register_task.cancel()
-        try:
-            await service_register_task
-        except asyncio.CancelledError:
-            pass
 
 
 if __name__ == "__main__":
