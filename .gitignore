@@ -167,5 +167,3 @@ log/
 *.pid
 
 config-dev.yaml
-config-prod.yaml
-config-test.yaml
