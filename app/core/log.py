@@ -18,9 +18,9 @@ LOGGING_CONFIG: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "simple": {"format": "%(levelname)s [%(asctime)s] %(message)s"},
+        "simple": {"format": "[%(asctime)s] %(levelname)s %(message)s"},
         "verbose": {
-            "format": "%(levelname)s [%(asctime)s] %(pathname)s "
+            "format": "[%(asctime)s] %(levelname)s %(pathname)s "
             "%(lineno)d %(funcName)s %(process)d %(thread)d "
             "\n \t [%(name)s] %(message)s \n",
             "datefmt": "%Y-%m-%d %H:%M:%S",
