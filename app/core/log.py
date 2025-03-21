@@ -49,6 +49,10 @@ LOGGING_CONFIG: dict[str, Any] = {
             **_DEFAULT_FILE_HANDLER,
             "filename": config.log.log_dir / "task.log",
         },
+        "apscheduler": {
+            **_DEFAULT_FILE_HANDLER,
+            "filename": config.log.log_dir / "apscheduler.log",
+        },
     },
     "loggers": {
         "app": {"handlers": ["app", "console"], "level": "INFO"},
@@ -57,6 +61,7 @@ LOGGING_CONFIG: dict[str, Any] = {
         "uvicorn": {"handlers": ["server", "console"], "level": "INFO"},
         "uvicorn.access": {"handlers": ["access", "console"], "level": "INFO", "propagate": False},
         "__main__": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "apscheduler": {"handlers": ["apscheduler", "console"], "level": "INFO"},
     },
 }
 
