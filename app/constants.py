@@ -8,3 +8,32 @@ AUTH_WHITELIST = [
     "/static-offline-docs/favicon.png",
     "/static-offline-docs/redoc.standalone.js",
 ]
+
+# skywalking 禁用插件列表
+SW_AGENT_DISABLE_PLUGINS = [
+    "sw_aiormq",
+    "sw_amqp",
+    "sw_asyncpg",
+    "sw_bottle",
+    "sw_celery",
+    "sw_confluent_kafka",
+    "sw_django",
+    "sw_elasticsearch",
+    "sw_falcon",
+    "sw_flask",
+    "sw_happybase",
+    "sw_kafka",
+    "sw_loguru",
+    "sw_mysqlclient",
+    "sw_neo4j",
+    "sw_psycopg",
+    "sw_psycopg2",
+    "sw_pulsar",
+    "sw_pymongo",
+    "sw_pyramid",
+    "sw_rabbitmq",
+    "sw_redis",
+    "sw_sanic",
+    "sw_tornado",
+    "sw_urllib3",
+]

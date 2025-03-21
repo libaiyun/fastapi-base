@@ -5,6 +5,7 @@ import uvicorn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from skywalking import agent, config as sw_config
 
+from app.constants import SW_AGENT_DISABLE_PLUGINS
 from app.core.log import LOGGING_CONFIG
 from app.core.service_discovery import ServiceDiscovery
 from config import config, config_syncer
@@ -50,6 +51,7 @@ if __name__ == "__main__":
             agent_log_reporter_active=config.sw.agent_log_reporter_active,
             agent_log_reporter_level=config.sw.agent_log_reporter_level,
             agent_meter_reporter_active=config.sw.agent_meter_reporter_active,
+            agent_disable_plugins=SW_AGENT_DISABLE_PLUGINS,
         )
         agent.start()
     asyncio.run(main())
