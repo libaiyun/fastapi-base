@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional, Literal, Any, Dict
 
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, field_validator, model_validator, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
 
 APP_PATH = Path(__file__).parent.parent
@@ -50,8 +50,7 @@ class ServerConfig(BaseModel):
 
 
 class LogConfig(BaseModel):
-    log_dir: Path = APP_PATH / "log"
-    log_dir.mkdir(parents=True, exist_ok=True)
+    log_dir: Path = Field(APP_PATH / "log", validate_default=True)
     rotate_when: Literal["S", "M", "H", "D", "MIDNIGHT", "W"] = "MIDNIGHT"
     backup_count: int = 30
 
@@ -85,6 +84,7 @@ class NacosConfig(BaseModel):
     group: str = "DEFAULT_GROUP"
     enable_discovery: bool = False
     enable_config: bool = False
+    cache_dir: Path = Field(APP_PATH / ".cache/nacos", validate_default=True)
 
     @field_validator("server_url", mode="after")
     def format_server_url(cls, v: str):
@@ -94,6 +94,11 @@ class NacosConfig(BaseModel):
         if ":" not in server_url.split("//", 1)[-1]:
             server_url += ":8848"
         return server_url
+
+    @field_validator("cache_dir", mode="after")
+    def ensure_cache_path_exists(cls, v: Path):
+        v.mkdir(parents=True, exist_ok=True)
+        return v
 
 
 class GatewayConfig(BaseModel):

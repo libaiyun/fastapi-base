@@ -9,7 +9,7 @@ server:
   limit_concurrency: 200 # 每个worker并发请求数上限
   limit_max_requests: # 每个worker重启前最大请求数，null表示不限制
 log:
-  #log_dir: /app/log
+  #log_dir: log
   rotate_when: MIDNIGHT # 日志轮转时机: S, M, H, D, MIDNIGHT, W
   backup_count: 30 # 日志文件保留个数
 mysql:
@@ -32,6 +32,7 @@ nacos:
   group: DEFAULT_GROUP # 分组名称
   enable_discovery: false # 是否启用服务发现注册
   enable_config: false # 是否启用配置管理同步
+  #cache_dir: .cache/nacos
 gateway:
   login_url: http://192.168.31.27:8080/auth/login # 网关登录地址
   service_url: http://192.168.31.27:8080/{service_name} # 经过网关的当前服务地址

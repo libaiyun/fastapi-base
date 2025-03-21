@@ -26,6 +26,7 @@ class ConfigSyncer:
             .namespace_id(self.config.nacos.namespace_id)
             .grpc_config(GRPCConfig(grpc_timeout=5000))
             .log_level(logging.INFO)
+            .cache_dir(str(self.config.nacos.cache_dir))
             .log_dir(str(self.config.log.log_dir))
             .build()
         )
