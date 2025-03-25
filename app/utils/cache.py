@@ -119,14 +119,14 @@ class MemoryCache:
     async def set(self, key: str, value: Any, expire_seconds: Optional[int]) -> None:
         async with self._lock:
             current_time = time.monotonic()
-            # 清理过期条目
-            if len(self._store) >= self.maxsize:
-                expired_keys = [k for k, v in self._store.items() if v["expire"] and v["expire"] <= current_time]
-                for k in expired_keys:
-                    del self._store[k]
-            # 淘汰旧条目
+            # 清理所有过期条目
+            expired_keys = [k for k, v in self._store.items() if v["expire"] and v["expire"] <= current_time]
+            for k in expired_keys:
+                del self._store[k]
+            # 淘汰旧条目直到容量达标
             while len(self._store) >= self.maxsize:
                 self._store.popitem(last=False)
+            # 添加新条目
             expire = current_time + expire_seconds if expire_seconds else None
             self._store[key] = {"value": value, "expire": expire}
             self._store.move_to_end(key)
