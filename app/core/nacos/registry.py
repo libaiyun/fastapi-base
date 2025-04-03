@@ -1,35 +1,22 @@
+import asyncio
 import logging
 from typing import Optional, Dict, Any
 
-from v2.nacos import NacosNamingService, ClientConfigBuilder, GRPCConfig, RegisterInstanceParam, DeregisterInstanceParam
+from v2.nacos import NacosNamingService, RegisterInstanceParam, DeregisterInstanceParam
 
 from app.config import APP_ENV
-from app.config.models import AppConfig
+from app.config import AppConfig, config
+from app.core.nacos.naming import create_naming_service
 
 logger = logging.getLogger(__name__)
 
 
-class ServiceDiscovery:
-    def __init__(self, config: AppConfig):
-        self.config = config
+class ServiceRegistry:
+    def __init__(self, _config: AppConfig):
+        self.config = _config
         self.naming_client: Optional[NacosNamingService] = None
-        self.client_config = self._build_client_config()
         self._registered = False
-
-    def _build_client_config(self):
-        """构建Nacos客户端配置"""
-        return (
-            ClientConfigBuilder()
-            .server_address(self.config.nacos.server_url)
-            .username(self.config.nacos.username)
-            .password(self.config.nacos.password)
-            .namespace_id("public")
-            .grpc_config(GRPCConfig(grpc_timeout=5000))
-            .log_level(logging.INFO)
-            .cache_dir(str(self.config.nacos.cache_dir))
-            .log_dir(str(self.config.log.log_dir))
-            .build()
-        )
+        self._registry_task: Optional[asyncio.Task] = None
 
     async def start(self):
         """启动服务注册"""
@@ -39,7 +26,7 @@ class ServiceDiscovery:
 
         try:
             # 初始化客户端
-            self.naming_client = await NacosNamingService.create_naming_service(self.client_config)
+            self.naming_client = await create_naming_service()
 
             # 注册服务实例
             await self._register_instance()
@@ -78,7 +65,15 @@ class ServiceDiscovery:
             ephemeral=True,
         )
 
-        await self.naming_client.register_instance(request=register_params)
+        async def register():
+            while True:
+                try:
+                    await self.naming_client.register_instance(request=register_params)
+                except Exception as e:
+                    logger.error(f"服务实例注册失败: {e}")
+                await asyncio.sleep(60)
+
+        self._registry_task = asyncio.create_task(register())
 
     async def _deregister_instance(self):
         """注销服务实例"""
@@ -99,3 +94,6 @@ class ServiceDiscovery:
             "environment": APP_ENV,
         }
         return base_metadata
+
+
+service_registry = ServiceRegistry(config)

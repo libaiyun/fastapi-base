@@ -8,19 +8,18 @@ from skywalking import agent, config as sw_config
 from app.constants import SW_AGENT_DISABLE_PLUGINS
 from app.core.log import LOGGING_CONFIG
 from app.core.nacos.config import config_syncer
-from app.core.service_discovery import ServiceDiscovery
 from app.config import config
+from app.core.nacos.registry import service_registry
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
 
 async def main():
-    service_discovery = ServiceDiscovery(config)
     scheduler = AsyncIOScheduler()
     scheduler.start()
 
     try:
-        await service_discovery.start()
+        await service_registry.start()
         await config_syncer.start()
         server = uvicorn.Server(
             uvicorn.Config(
@@ -39,7 +38,7 @@ async def main():
         pass
     finally:
         scheduler.shutdown()
-        await service_discovery.stop()
+        await service_registry.stop()
         await config_syncer.stop()
 
 
