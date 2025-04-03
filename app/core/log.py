@@ -33,7 +33,7 @@ LOGGING_CONFIG: dict[str, Any] = {
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "level": "INFO",
+            "level": "DEBUG",
             "formatter": "simple",
             "stream": "ext://sys.stdout",
             "filters": ["request_id"],
@@ -73,6 +73,10 @@ LOGGING_CONFIG: dict[str, Any] = {
 if APP_ENV == AppEnv.DEV:
     for _logger in LOGGING_CONFIG["loggers"]:
         LOGGING_CONFIG["loggers"][_logger]["handlers"] = ["console"]
+
+if config.debug:
+    for _logger in LOGGING_CONFIG["loggers"]:
+        LOGGING_CONFIG["loggers"][_logger]["level"] = "DEBUG"
 
 
 class RequestIDFilter(logging.Filter):
