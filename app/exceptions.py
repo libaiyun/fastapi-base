@@ -173,13 +173,10 @@ def register_exception_handlers(app: FastAPI):
     async def app_exception_handler(request: Request, exc: AppException):
         logger.log(
             exc.LOG_LEVEL,
-            ("捕获主动抛出异常, 具体异常堆栈->[%s] status_code->[%s] & message->[%s] & args->[%s] & data->[%s]")
+            "捕获主动抛出异常: [%s], 具体异常堆栈->[%s]"
             % (
+                str(exc),
                 traceback.format_exc(),
-                exc.ERROR_CODE,
-                exc.message,
-                exc.args,
-                exc.data,
             ),
         )
         return JSONResponse(content=exc.response_data, status_code=exc.STATUS_CODE)
@@ -191,14 +188,14 @@ def register_exception_handlers(app: FastAPI):
             "query_params": request.query_params,
         }
         logger.error(
-            "捕获未处理异常,异常具体堆栈->[%s], 请求链ID->[%s] 请求URL->[%s], "
-            "请求方法->[%s] 请求参数->[%s]"
+            "捕获未处理异常: [%s], 请求链ID->[%s] 请求URL->[%s], 请求方法->[%s] 请求参数->[%s] 异常具体堆栈->[%s]"
             % (
-                traceback.format_exc(),
+                str(exc),
                 request.state.request_id,
                 request.url.path,
                 request.method,
                 request_params,
+                traceback.format_exc(),
             )
         )
         return JSONResponse(
