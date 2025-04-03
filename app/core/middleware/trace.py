@@ -7,7 +7,7 @@ from app.context import request_id_context
 
 
 async def add_request_id(request: Request, call_next):
-    request_id = uuid.uuid4().hex
+    request_id = uuid.uuid4().hex[:16]
     request_id_context.set(request_id)
     request.state.request_id = request_id
     response = await call_next(request)
