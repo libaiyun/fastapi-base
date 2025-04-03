@@ -11,6 +11,7 @@ from starlette.responses import JSONResponse
 from app.api.deps.oauth2 import oauth2_scheme, get_signature
 from app.core.log import LOGGING_CONFIG
 from app.core.middleware import register_middlewares
+from app.core.nacos.discovery import service_discovery
 from app.exceptions import register_exception_handlers, RemoteServiceException
 from app.core.make_api_offline import make_api_offline
 from app.api.v1.router import router as api_v1
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     try:
+        await service_discovery.init()
         yield
     finally:
         pass

@@ -164,6 +164,11 @@ class ApiNotAcceptable(RemoteServiceException):
     MESSAGE = "远程服务数据格式异常"
 
 
+class NoInstanceAvailable(RemoteServiceException):
+    ERROR_CODE = "50024"
+    MESSAGE = "无可用实例"
+
+
 class StateTransitionError(ServerException):
     ERROR_CODE = "50030"
     MESSAGE = "状态流转异常"
