@@ -16,7 +16,7 @@ from app.core.make_api_offline import make_api_offline
 from app.api.v1.router import router as api_v1
 from app.schemas.error_report import ErrorReport
 from app.schemas.token import Token
-from config import config, APP_ENV
+from app.config import config, APP_ENV
 
 logging.config.dictConfig(LOGGING_CONFIG)
 

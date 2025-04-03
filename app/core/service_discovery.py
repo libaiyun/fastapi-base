@@ -3,8 +3,8 @@ from typing import Optional, Dict, Any
 
 from v2.nacos import NacosNamingService, ClientConfigBuilder, GRPCConfig, RegisterInstanceParam, DeregisterInstanceParam
 
-from config import APP_ENV
-from config.models import AppConfig
+from app.config import APP_ENV
+from app.config.models import AppConfig
 
 logger = logging.getLogger(__name__)
 

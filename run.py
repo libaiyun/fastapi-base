@@ -7,8 +7,9 @@ from skywalking import agent, config as sw_config
 
 from app.constants import SW_AGENT_DISABLE_PLUGINS
 from app.core.log import LOGGING_CONFIG
+from app.core.nacos.config import config_syncer
 from app.core.service_discovery import ServiceDiscovery
-from config import config, config_syncer
+from app.config import config
 
 logging.config.dictConfig(LOGGING_CONFIG)
 

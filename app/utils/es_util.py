@@ -5,7 +5,7 @@ from typing import Sequence, List
 
 from elasticsearch import AsyncElasticsearch
 
-from config import config
+from app.config import config
 
 logger = logging.getLogger(__name__)
 

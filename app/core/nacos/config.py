@@ -4,17 +4,17 @@ from typing import Optional
 import yaml
 from v2.nacos import NacosConfigService, ClientConfigBuilder, GRPCConfig, ConfigParam
 
-from config.models import AppConfig
+from app.config import AppConfig, config
 
 logger = logging.getLogger(__name__)
 
 
 class ConfigSyncer:
-    def __init__(self, config: AppConfig):
-        self.config = config
+    def __init__(self, _config: AppConfig):
+        self.config = _config
         self.config_client: Optional[NacosConfigService] = None
         self.client_config = self._build_client_config()
-        self._data_id = f"{config.service_name}.yaml"
+        self._data_id = f"{_config.service_name}.yaml"
 
     def _build_client_config(self):
         """构建Nacos客户端配置"""
@@ -112,3 +112,6 @@ class ConfigSyncer:
                 logger.info("配置变更已生效")
         except Exception as e:
             logger.error(f"配置监听处理失败: {e}")
+
+
+config_syncer = ConfigSyncer(config)

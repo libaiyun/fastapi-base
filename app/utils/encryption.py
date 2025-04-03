@@ -4,7 +4,7 @@ import os
 
 from cryptography.fernet import Fernet
 
-from config import config
+from app.config import config
 
 # 推荐通过环境变量注入密钥
 # 生成新密钥：Fernet.generate_key().decode()

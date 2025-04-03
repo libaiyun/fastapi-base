@@ -6,7 +6,7 @@ from typing import Optional, Literal, Any, Dict
 from pydantic import BaseModel, field_validator, model_validator, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
 
-APP_PATH = Path(__file__).parent.parent
+APP_PATH = Path(__file__).parent.parent.parent
 
 
 class AppEnv(str, Enum):

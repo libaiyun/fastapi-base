@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 
 from aiocache import caches, SimpleMemoryCache, RedisCache
 
-from config import config
+from app.config import config
 
 redis_url = urlparse(config.redis.url)
 

@@ -1,6 +1,6 @@
 import aioredis
 
-from config import config
+from app.config import config
 
 
 def make_redis():

@@ -7,7 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.api.deps.session import get_session
 from app.core.db import ASYNC_DATABASE_URL
 from app.main import app
-from config import config
+from app.config import config
 
 engine = create_async_engine(
     ASYNC_DATABASE_URL,  # 请替换成用于单元测试的数据库URL

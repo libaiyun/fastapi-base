@@ -1,5 +1,5 @@
 from app.utils.redis_util import redis_cli
-from config import APP_ENV
+from app.config import APP_ENV
 
 
 # 示例: _=Depends(partial(api_lock, lock_key="update_hero")),

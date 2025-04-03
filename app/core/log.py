@@ -2,8 +2,8 @@ import logging
 from typing import Any
 
 from app.context import request_id_context
-from config import config, APP_ENV
-from config.models import AppEnv
+from app.config import config, APP_ENV
+from app.config.models import AppEnv
 
 _DEFAULT_FILE_HANDLER = {
     "filters": ["request_id"],
@@ -61,7 +61,7 @@ LOGGING_CONFIG: dict[str, Any] = {
     },
     "loggers": {
         "app": {"handlers": ["app", "console"], "level": "INFO"},
-        "config": {"handlers": ["app", "console"], "level": "INFO"},
+        "app.config": {"handlers": ["app", "console"], "level": "INFO", "propagate": False},
         "app.task": {"handlers": ["task", "console"], "level": "INFO", "propagate": False},
         "uvicorn": {"handlers": ["server", "console"], "level": "INFO"},
         "uvicorn.access": {"handlers": ["access", "console"], "level": "INFO", "propagate": False},
