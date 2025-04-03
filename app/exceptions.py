@@ -50,6 +50,7 @@ class ClientException(AppException):
     ERROR_CODE = "40000"
     MESSAGE = "客户端请求异常"
     STATUS_CODE = 400
+    LOG_LEVEL = logging.INFO
 
 
 class ServerException(AppException):
