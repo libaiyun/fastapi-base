@@ -1,9 +1,12 @@
+import logging
 from typing import Any
 
+from app.context import request_id_context
 from config import config, APP_ENV
 from config.models import AppEnv
 
 _DEFAULT_FILE_HANDLER = {
+    "filters": ["request_id"],
     "formatter": "simple",
     "class": "concurrent_log_handler.ConcurrentTimedRotatingFileHandler",
     "filename": config.log.log_dir / "app.log",
@@ -17,10 +20,11 @@ _DEFAULT_FILE_HANDLER = {
 LOGGING_CONFIG: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {"request_id": {"()": "app.core.log.RequestIDFilter"}},
     "formatters": {
-        "simple": {"format": "[%(asctime)s] %(levelname)s %(message)s"},
+        "simple": {"format": "[%(asctime)s] [%(request_id)s] %(levelname)s %(message)s"},
         "verbose": {
-            "format": "[%(asctime)s] %(levelname)s %(pathname)s "
+            "format": "[%(asctime)s] [%(request_id)s] %(levelname)s %(pathname)s "
             "%(lineno)d %(funcName)s %(process)d %(thread)d "
             "\n \t [%(name)s] %(message)s \n",
             "datefmt": "%Y-%m-%d %H:%M:%S",
@@ -32,6 +36,7 @@ LOGGING_CONFIG: dict[str, Any] = {
             "level": "INFO",
             "formatter": "simple",
             "stream": "ext://sys.stdout",
+            "filters": ["request_id"],
         },
         "app": {
             **_DEFAULT_FILE_HANDLER,
@@ -68,3 +73,9 @@ LOGGING_CONFIG: dict[str, Any] = {
 if APP_ENV == AppEnv.DEV:
     for _logger in LOGGING_CONFIG["loggers"]:
         LOGGING_CONFIG["loggers"][_logger]["handlers"] = ["console"]
+
+
+class RequestIDFilter(logging.Filter):
+    def filter(self, record):
+        record.request_id = request_id_context.get("-")
+        return True

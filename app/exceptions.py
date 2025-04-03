@@ -173,7 +173,7 @@ def register_exception_handlers(app: FastAPI):
     async def app_exception_handler(request: Request, exc: AppException):
         logger.log(
             exc.LOG_LEVEL,
-            ("捕获主动抛出异常, 具体异常堆栈->[%s] status_code->[%s] & " "message->[%s] & args->[%s] & data->[%s]")
+            ("捕获主动抛出异常, 具体异常堆栈->[%s] status_code->[%s] & message->[%s] & args->[%s] & data->[%s]")
             % (
                 traceback.format_exc(),
                 exc.ERROR_CODE,
