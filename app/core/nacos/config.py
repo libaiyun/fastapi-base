@@ -16,6 +16,12 @@ class ConfigSyncer:
         self.client_config = self._build_client_config()
         self._data_id = f"{_config.service_name}.yaml"
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.stop()
+
     def _build_client_config(self):
         """构建Nacos客户端配置"""
         return (

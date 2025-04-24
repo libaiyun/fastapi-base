@@ -18,6 +18,8 @@ from app.api.v1.router import router as api_v1
 from app.schemas.error_report import ErrorReport
 from app.schemas.token import Token
 from app.config import config, APP_ENV
+from app.core.nacos.config import ConfigSyncer
+from app.utils.sw import start_sw_agent
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
@@ -26,11 +28,15 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    try:
-        await service_discovery.init()
-        yield
-    finally:
-        pass
+    async with ConfigSyncer(config) as syncer:
+        await syncer.start()
+
+        try:
+            await service_discovery.init()
+            start_sw_agent()
+            yield
+        finally:
+            await service_discovery.shutdown()
 
 
 servers = None

@@ -18,6 +18,12 @@ class ServiceRegistry:
         self._registered = False
         self._registry_task: Optional[asyncio.Task] = None
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.stop()
+
     async def start(self):
         """启动服务注册"""
         if not self.config.nacos.enable_discovery:
