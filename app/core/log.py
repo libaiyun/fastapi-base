@@ -60,13 +60,14 @@ LOGGING_CONFIG: dict[str, Any] = {
         },
     },
     "loggers": {
-        "app": {"handlers": ["app", "console"], "level": "INFO"},
+        "": {"handlers": ["console"], "level": "INFO"},
+        "app": {"handlers": ["app", "console"], "level": "INFO", "propagate": False},
         "app.config": {"handlers": ["app", "console"], "level": "INFO", "propagate": False},
         "app.task": {"handlers": ["task", "console"], "level": "INFO", "propagate": False},
-        "uvicorn": {"handlers": ["server", "console"], "level": "INFO"},
+        "uvicorn": {"handlers": ["server", "console"], "level": "INFO", "propagate": False},
         "uvicorn.access": {"handlers": ["access", "console"], "level": "INFO", "propagate": False},
         "__main__": {"handlers": ["console"], "level": "INFO", "propagate": False},
-        "apscheduler": {"handlers": ["apscheduler", "console"], "level": "INFO"},
+        "apscheduler": {"handlers": ["apscheduler", "console"], "level": "INFO", "propagate": False},
     },
 }
 
