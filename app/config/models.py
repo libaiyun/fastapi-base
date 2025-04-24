@@ -137,6 +137,7 @@ class SkyWalkingConfig(BaseModel):
     agent_log_reporter_active: bool = True
     agent_log_reporter_level: str = "WARNING"
     agent_meter_reporter_active: bool = True
+    agent_logging_level: str = "WARNING"
 
 
 class AppConfig(BaseSettings):

@@ -14,5 +14,6 @@ def start_sw_agent():
         agent_log_reporter_level=config.sw.agent_log_reporter_level,
         agent_meter_reporter_active=config.sw.agent_meter_reporter_active,
         agent_disable_plugins=SW_AGENT_DISABLE_PLUGINS,
+        agent_logging_level=config.sw.agent_logging_level,
     )
     agent.start()
