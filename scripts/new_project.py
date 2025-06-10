@@ -1,6 +1,9 @@
 import os.path
+from pathlib import Path
 import shutil
 import subprocess
+
+BASE_PROJECT_NAME = "fastapi-base"
 
 
 def copy_git_files(src_dir, dest_dir):
@@ -52,18 +55,20 @@ def init_git_repo(dest_dir, remote_url=None):
 
 
 def main():
-    src_dir = "E:/code/py/fastapi-base"  # 当前项目路径
-    dest_dir = "E:/code/py/new-fastapi-project"  # 新项目路径
-    new_project_name = "new-fastapi-project"  # 新项目名
+    new_project_name = "foreign-fulltext"  # 新项目名
+    src_dir = Path(__file__).parent.parent  # 当前项目路径
+    dest_dir = src_dir.parent / new_project_name  # 新项目路径
+    src_dir = str(src_dir)
+    dest_dir = str(dest_dir)
 
     print("开始复制项目文件...")
     copy_git_files(src_dir, dest_dir)
 
     print("开始全局替换项目名...")
-    replace_project_name(dest_dir, "fastapi-base", new_project_name)
+    replace_project_name(dest_dir, BASE_PROJECT_NAME, new_project_name)
 
     print("初始化新的 Git 仓库...")
-    init_git_repo(dest_dir, remote_url="http://192.168.30.28/libaiyun/test.git")
+    init_git_repo(dest_dir, remote_url="http://192.168.30.28/datacenter-datawarehouse/foreign-fulltext.git")
 
     print("新项目创建完成！")
 
