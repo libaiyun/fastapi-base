@@ -28,7 +28,7 @@ class Pagination(BaseModel):
 
 
 class Sort(BaseModel):
-    sort_by: Optional[str] = Field(None, description="排序字段，支持任意字段名")
+    sort_by: Optional[str] = Field(None, description="排序字段，支持任意字段名", examples=[None])
     sort_order: SortOrder = Field(SortOrder.ASC, description="排序方式，可选值：asc（升序）、desc（降序）")
 
 

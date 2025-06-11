@@ -6,3 +6,8 @@ def split_comma_separated(value: str, type_: type = str, separator: str = ",") -
     if not value:
         return []
     return [type_(i.strip()) for i in value.split(separator) if i.strip()]
+
+
+def snake2pascal(snake_str: str) -> str:
+    words = snake_str.split("_")
+    return "".join(w.capitalize() for w in words)

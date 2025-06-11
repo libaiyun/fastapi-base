@@ -71,6 +71,7 @@ def main():
     init_git_repo(dest_dir, remote_url="http://192.168.30.28/datacenter-datawarehouse/foreign-fulltext.git")
 
     print("新项目创建完成！")
+    print("请在 auto_deploy.sh 更新自动化部署配置。")
 
 
 if __name__ == "__main__":
