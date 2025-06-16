@@ -25,6 +25,14 @@ send_notification() {
         }' || log "发送通知失败"
 }
 
+# 统一错误处理函数
+handle_error() {
+    local error_msg="$1"
+    log "错误：$error_msg"
+    send_notification "⚠️ 部署失败：$error_msg"
+    exit 1
+}
+
 # 检查端口是否被占用
 check_port_used() {
     local port=$1
@@ -33,8 +41,7 @@ check_port_used() {
     elif command -v netstat >/dev/null 2>&1; then
         netstat -tuln | grep -q ":$port "
     else
-        log "错误：需要安装 ss 或 netstat 来检查端口占用"
-        exit 1
+        handle_error "需要安装 ss 或 netstat 来检查端口占用"
     fi
 }
 
@@ -77,13 +84,11 @@ fi
 set -e  # 一旦发生错误，脚本将退出
 
 if [ -z "$SERVER_HOST" ]; then
-    log "错误：无法获取本地IP"
-    send_notification "⚠️ 部署失败：无法获取服务IP"
-    exit 1
+    handle_error "无法获取本地IP"
 fi
 
 # 切换到工作目录
-cd "$WORK_DIR" || { log "无法进入目录 $WORK_DIR"; exit 1; }
+cd "$WORK_DIR" || handle_error "无法进入目录 $WORK_DIR"
 
 # 设置远程 URL
 git remote set-url origin "$REPO_URL"
@@ -94,11 +99,11 @@ trap 'git remote set-url origin "$ORIGINAL_REPO_URL"' EXIT
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [ "$CURRENT_BRANCH" != "$RELEASE_BRANCH" ]; then
     log "当前分支是 $CURRENT_BRANCH, 正在切换到 $RELEASE_BRANCH"
-    git checkout "$RELEASE_BRANCH" || { log "切换分支失败"; exit 1; }
+    git checkout "$RELEASE_BRANCH" || handle_error "切换分支失败"
 fi
 
 # 更新远程仓库信息
-git fetch origin || { log "fetch 失败"; exit 1; }
+git fetch origin || handle_error "fetch 失败"
 
 LOCAL_COMMIT=$(git rev-parse "$RELEASE_BRANCH")
 REMOTE_COMMIT=$(git rev-parse "origin/$RELEASE_BRANCH")
@@ -108,12 +113,12 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     if [ "$FORCE_DEPLOY" -eq 1 ]; then
         log "执行强制部署"
         # 强制更新代码
-        git reset --hard "origin/$RELEASE_BRANCH" || { log "强制重置分支失败"; exit 1; }
+        git reset --hard "origin/$RELEASE_BRANCH" || handle_error "强制重置分支失败"
         log "当前代码版本：$(git rev-parse --short HEAD)"
     else
         log "检测到代码更新，开始持续部署流程..."
         # 拉取最新更新
-        git pull origin "$RELEASE_BRANCH" || { log "pull 失败"; exit 1; }
+        git pull origin "$RELEASE_BRANCH" || handle_error "pull 失败"
         log "此次更新的 commit 列表:"
         git log --oneline "$LOCAL_COMMIT..$REMOTE_COMMIT"
     fi
@@ -130,7 +135,7 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     # 构建Docker镜像
     log "开始构建容器镜像..."
     DOCKER_BUILDKIT=1 docker build -t "$DOCKER_IMAGE" . || {
-        log "镜像构建失败";
+        log "镜像构建失败"
         send_notification "容器镜像构建失败！\n请检查构建日志"
         exit 1
     }
@@ -140,10 +145,9 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     # 启动容器前检查端口占用
     if check_port_used "${SERVER_PORT}"; then
-        log "错误：宿主机端口 ${SERVER_PORT} 已被占用"
-        send_notification "⚠️ 部署失败：端口 ${SERVER_PORT} 冲突"
-        exit 1
+        handle_error "宿主机端口 ${SERVER_PORT} 已被占用"
     fi
+
     # 启动新容器
     log "启动新版本容器..."
     docker run -d \
@@ -156,7 +160,7 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
         -v "$(pwd)/$CONFIG_FILE:/app/config-prod.yaml" \
         -v "$(pwd)/log:/app/log" \
         "$DOCKER_IMAGE" || {
-            log "容器启动失败";
+            log "容器启动失败"
             send_notification "容器启动失败！\n请检查运行时配置"
             exit 1
         }
