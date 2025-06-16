@@ -190,7 +190,7 @@ class AppConfig(BaseSettings):
 
     @property
     def service_name(self):
-        return self.namespace.replace("_", "-").rstrip("-prod")
+        return self.namespace.replace("_", "-").removesuffix("-prod")
 
     @model_validator(mode="after")
     def format_service_url(self) -> "AppConfig":
