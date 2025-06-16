@@ -38,6 +38,13 @@ check_port_used() {
     fi
 }
 
+# 处理强制部署参数
+FORCE_DEPLOY=0
+if [ "$1" == "-f" ] || [ "$1" == "--force" ]; then
+    FORCE_DEPLOY=1
+    log "检测到强制部署参数"
+fi
+
 # 远程仓库地址
 ORIGINAL_REPO_URL="http://192.168.30.28/framework/fastapi-base.git"
 GIT_USER="cqvipcq%40outlook.com"
@@ -96,14 +103,20 @@ git fetch origin || { log "fetch 失败"; exit 1; }
 LOCAL_COMMIT=$(git rev-parse "$RELEASE_BRANCH")
 REMOTE_COMMIT=$(git rev-parse "origin/$RELEASE_BRANCH")
 
-if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
-    log "检测到代码更新，开始持续部署流程..."
-
-    # 拉取最新更新
-    git pull origin "$RELEASE_BRANCH" || { log "pull 失败"; exit 1; }
-
-    log "此次更新的 commit 列表:"
-    git log --oneline "$LOCAL_COMMIT..$REMOTE_COMMIT"
+# 添加强制部署逻辑
+if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
+    if [ "$FORCE_DEPLOY" -eq 1 ]; then
+        log "执行强制部署"
+        # 强制更新代码
+        git reset --hard "origin/$RELEASE_BRANCH" || { log "强制重置分支失败"; exit 1; }
+        log "当前代码版本：$(git rev-parse --short HEAD)"
+    else
+        log "检测到代码更新，开始持续部署流程..."
+        # 拉取最新更新
+        git pull origin "$RELEASE_BRANCH" || { log "pull 失败"; exit 1; }
+        log "此次更新的 commit 列表:"
+        git log --oneline "$LOCAL_COMMIT..$REMOTE_COMMIT"
+    fi
 
     # 验证配置文件存在
     [[ ! -f "$CONFIG_FILE" ]] && {
@@ -111,8 +124,8 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
         touch "$CONFIG_FILE"
     }
 
-    REMOTE_COMMIT_SHORT=$(git rev-parse --short "origin/$RELEASE_BRANCH")
-    DOCKER_IMAGE="${PROJECT_NAME}:${REMOTE_COMMIT_SHORT}-$(date +%Y%m%d%H%M)"
+    DEPLOY_COMMIT_SHORT=$(git rev-parse --short HEAD)
+    DOCKER_IMAGE="${PROJECT_NAME}:${DEPLOY_COMMIT_SHORT}-$(date +%Y%m%d%H%M)"
 
     # 构建Docker镜像
     log "开始构建容器镜像..."
@@ -149,14 +162,20 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
         }
 
     # 生成变更报告
-    COMMIT_LIST=$(git log --oneline --no-merges "${LOCAL_COMMIT}..${REMOTE_COMMIT}")
-    NOTIFICATION_CONTENT="✅ 容器化部署成功\n\n**版本信息**\n> 镜像版本：${DOCKER_IMAGE}\n> 部署时间：$(date +'%Y-%m-%d %H:%M:%S')\n\n**更新内容**\n"
+    NOTIFICATION_CONTENT=""
+    if [ "$FORCE_DEPLOY" -eq 1 ]; then
+        NOTIFICATION_CONTENT+="🚀 **强制部署**\n\n> 已跳过常规版本检测\n> 当前代码版本：${DEPLOY_COMMIT_SHORT}\n\n"
+    else
+        COMMIT_LIST=$(git log --oneline --no-merges "${LOCAL_COMMIT}..${REMOTE_COMMIT}")
+        NOTIFICATION_CONTENT+="✅ 容器化部署成功\n\n**版本信息**\n> 镜像版本：${DOCKER_IMAGE}\n> 部署时间：$(date +'%Y-%m-%d %H:%M:%S')\n\n**更新内容**\n"
+        
+        while IFS= read -r commit; do
+            NOTIFICATION_CONTENT+="> ${commit}\n"
+        done <<< "$COMMIT_LIST"
+        NOTIFICATION_CONTENT+="\n"
+    fi
 
-    while IFS= read -r commit; do
-        NOTIFICATION_CONTENT+="> ${commit}\n"
-    done <<< "$COMMIT_LIST"
-
-    NOTIFICATION_CONTENT+="\n**访问地址**\n[接口文档](${OPENAPI_URL})"
+    NOTIFICATION_CONTENT+="**访问地址**\n[接口文档](${OPENAPI_URL})"
 
     # 发送企业微信通知
     send_notification "$NOTIFICATION_CONTENT"
@@ -164,4 +183,3 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 else
     log "当前已是最新版本，无需部署"
 fi
-
