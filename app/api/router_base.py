@@ -190,7 +190,7 @@ class RouterBase:
         schema_update = self.schema_update
 
         @router.post(
-            "/update/{pk}",
+            "/update/{pk:path}",
             response_model=APIResponse[self.schema_response],
             summary=f"{self.model.__name__} 更新",
             description="更新接口\n\n路径参数`pk`表示主键`{pk}`，即更新`{pk}`=pk的记录，联合主键多个值以`,`分隔".format(
