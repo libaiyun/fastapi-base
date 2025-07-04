@@ -37,3 +37,4 @@ HEALTHCHECK --interval=30s --timeout=10s \
     awk '!/RUNNING/ && !/^$/{exit 1}'
 
 CMD ["supervisord", "-n", "-c", "supervisord.conf"]
+# CMD ["bash", "startup.sh"] # 启动方式二: 脚本管理多进程
