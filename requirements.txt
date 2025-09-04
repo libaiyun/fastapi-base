@@ -23,7 +23,7 @@ apache-skywalking==1.1.0
 cryptography==44.0.2
 motor==3.7.0
 beanie==1.29.0
-nacos-sdk-python==2.0.7
+nacos-sdk-python==2.0.9
 aiocache[redis]==0.12.3
 # dev
 pytest==8.3.4
