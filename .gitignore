@@ -167,3 +167,5 @@ log/
 *.pid
 
 config-dev.yaml
+
+.vscode
