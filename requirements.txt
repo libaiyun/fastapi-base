@@ -25,9 +25,3 @@ motor==3.7.0
 beanie==1.29.0
 nacos-sdk-python==2.0.9
 aiocache[redis]==0.12.3
-# dev
-pytest==8.3.4
-pytest-asyncio==0.25.2
-httpx==0.28.1
-ipython==8.34.0
-git+http://192.168.30.28/tools/sqlacodegen.git@3.1.4
