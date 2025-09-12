@@ -146,12 +146,7 @@ def generate_schema(model: Type[SQLModel]) -> str:
             if "datetime" in python_type_name:
                 query_fields.extend(get_time_field_defs(field_name, python_type_name, kwargs))
             else:
-                # 特殊处理: 当字段是is_deprecated时，将default设置为0而不是None
-                if field_name == "is_deprecated":
-                    qf_kwargs = {**kwargs, "default": 0}
-                else:
-                    qf_kwargs = kwargs
-                query_fields.append(get_optional_field_def(field_name, python_type_name, qf_kwargs))
+                query_fields.append(get_optional_field_def(field_name, python_type_name, kwargs))
             return_fields.append(field_name)
 
         public_fields.append(get_optional_field_def(field_name, python_type_name, kwargs))
