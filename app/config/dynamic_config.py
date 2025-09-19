@@ -59,13 +59,16 @@ class DynamicConfigManager:
                 logger.error(f"配置检查失败: {e}")
 
             # 等待最短间隔时间
-            await asyncio.sleep(min(item.interval for item in self.config_items.values()))
+            if self.config_items:
+                await asyncio.sleep(min(item.interval for item in self.config_items.values()))
+            else:
+                await asyncio.sleep(30)
 
     async def _check_configs(self):
         """检查所有配置项"""
         for key, item in self.config_items.items():
             try:
-                new_value = item.getter()
+                new_value = await item.getter()
                 old_value = self.current_values.get(key)
 
                 if new_value != old_value:
@@ -75,7 +78,7 @@ class DynamicConfigManager:
                     # 执行回调函数
                     if item.callback:
                         try:
-                            item.callback(new_value)
+                            await item.callback(new_value)
                         except Exception as e:
                             logger.error(f"配置 {key} 变更回调执行失败: {e}")
             except Exception as e:
