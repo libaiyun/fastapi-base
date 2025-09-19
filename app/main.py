@@ -18,6 +18,7 @@ from app.api.v1.router import router as api_v1
 from app.schemas.error_report import ErrorReport
 from app.schemas.token import Token
 from app.config import config, APP_ENV
+from app.config.dynamic_config import dynamic_config_manager
 from app.core.nacos.config import ConfigSyncer
 from app.utils.sw import start_sw_agent
 
@@ -34,8 +35,11 @@ async def lifespan(_app: FastAPI):
         try:
             await service_discovery.init()
             start_sw_agent()
+
+            await dynamic_config_manager.start()
             yield
         finally:
+            await dynamic_config_manager.stop()
             await service_discovery.shutdown()
 
 
@@ -88,6 +92,11 @@ if config.debug:
     @app.get("/config_info")
     async def get_config_info():
         return config.model_dump(mode="json")
+
+    @app.get("/dynamic-configs")
+    async def list_dynamic_configs():
+        """列出所有动态配置"""
+        return dynamic_config_manager.current_values
 
 
 if config.enable_oauth2:
