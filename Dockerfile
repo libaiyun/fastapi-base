@@ -11,9 +11,9 @@ RUN sed -i \
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    curl \
-    vim \
-    git \
+    # curl \
+    # vim \
+    # git \
     tzdata && \
     # 配置时区
     ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && \
@@ -27,13 +27,15 @@ WORKDIR /app
 # 优先安装依赖以利用缓存
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
-    -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
+    -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    --extra-index-url https://mirrors.aliyun.com/pypi/simple \
+    --extra-index-url https://pypi.mirrors.ustc.edu.cn/simple
 
 # 复制应用代码
 COPY . .
 
 HEALTHCHECK --interval=30s --timeout=10s \
-  CMD supervisorctl -c /app/supervisord.conf status | \
+    CMD supervisorctl -c /app/supervisord.conf status | \
     awk '!/RUNNING/ && !/^$/{exit 1}'
 
 CMD ["supervisord", "-n", "-c", "supervisord.conf"]
