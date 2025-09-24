@@ -101,13 +101,13 @@ class RouterBase:
             - 查询`source_type`字段为3或4的数据：
               `list/?source_type__in=3,4`"""
             data = await self.service.list(session, query)
-            return APIResponse(data=data)
+            return APIResponse(code=200, message="", data=data)
 
         @router.post("/list", **route_kwargs, summary=f"{self.model.__name__} 列表查询")
         async def post_read_items(query: schema_query, session: AsyncSession = Depends(get_session)):
             """POST类型的列表查询，参数与GET xx/list一致。用请求体参数代替查询参数，解决参数长度限制问题。"""
             data = await self.service.list(session, query)
-            return APIResponse(data=data)
+            return APIResponse(code=200, message="", data=data)
 
         @router.post("/query", **route_kwargs, summary=f"{self.model.__name__} 复杂条件查询")
         async def complex_query(query: ComplexQuery, session: AsyncSession = Depends(get_session)):
@@ -176,7 +176,7 @@ class RouterBase:
             }
             ```"""
             data = await self.service.complex_query(session, query)
-            return APIResponse(data=data)
+            return APIResponse(code=200, message="", data=data)
 
     def _add_create_route(self, router: APIRouter):
         schema_create = self.schema_create
