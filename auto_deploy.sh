@@ -63,7 +63,7 @@ PROJECT_NAME="fastapi-base"
 # 脚本的工作目录
 WORK_DIR="/data/projects/$PROJECT_NAME"
 SERVER_HOST=$(get_local_ip "192.168")
-SERVER_PORT="8150"
+SERVER_PORT="8001"
 #DOCKER_IMAGE="${PROJECT_NAME}:1.0.0"
 CONFIG_FILE="config-prod.yaml"
 # 企微群机器人通知webhook地址
