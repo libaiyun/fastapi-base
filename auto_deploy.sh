@@ -29,7 +29,7 @@ send_notification() {
 handle_error() {
     local error_msg="$1"
     log "错误：$error_msg"
-    send_notification "⚠️ 部署失败：$error_msg"
+    send_notification "⚠️ **部署失败**: ${error_msg}\n**项目名称**: ${PROJECT_NAME}\n**代码分支**: ${RELEASE_BRANCH}\n**部署节点**: ${SERVER_HOST}"
     exit 1
 }
 
@@ -68,8 +68,9 @@ SERVER_PORT="8150"
 CONFIG_FILE="config-prod.yaml"
 # 企微群机器人通知webhook地址
 QY_NOTIFY_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=013547da-3d78-4a7f-b4a7-e668b192c293"
-OPENAPI_URL="http://192.168.98.79:8150/docs"
 
+# 接口文档地址
+OPENAPI_URL="http://${SERVER_HOST}:${SERVER_PORT}/docs"
 # 远程仓库地址（带用户名和密码）
 REPO_URL="http://${GIT_USER}:${GIT_PASSWD}@${ORIGINAL_REPO_URL#http://}"
 
@@ -165,21 +166,50 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
             exit 1
         }
 
-    # 生成变更报告
-    NOTIFICATION_CONTENT=""
-    if [ "$FORCE_DEPLOY" -eq 1 ]; then
-        NOTIFICATION_CONTENT+="🚀 **强制部署**\n\n> 已跳过常规版本检测\n> 当前代码版本：${DEPLOY_COMMIT_SHORT}\n\n"
+    # 等待应用启动
+    log "等待应用启动"
+    sleep 5
+    # 检查应用健康状态
+    if curl -s "http://${SERVER_HOST}:${SERVER_PORT}/health" >/dev/null 2>&1; then
+        HEALTH_CHECK="✅ 通过"
     else
-        COMMIT_LIST=$(git log --oneline --no-merges "${LOCAL_COMMIT}..${REMOTE_COMMIT}")
-        NOTIFICATION_CONTENT+="✅ 容器化部署成功\n\n**版本信息**\n> 镜像版本：${DOCKER_IMAGE}\n> 部署时间：$(date +'%Y-%m-%d %H:%M:%S')\n\n**更新内容**\n"
-        
-        while IFS= read -r commit; do
-            NOTIFICATION_CONTENT+="> ${commit}\n"
-        done <<< "$COMMIT_LIST"
-        NOTIFICATION_CONTENT+="\n"
+        HEALTH_CHECK="⚠️ 失败(接口可能尚未就绪)"
     fi
 
-    NOTIFICATION_CONTENT+="**访问地址**\n[接口文档](${OPENAPI_URL})"
+    # 生成变更报告
+    DEPLOY_MODE="自动触发"
+    CHANGELOG_CONTENT=""
+    if [ "$FORCE_DEPLOY" -eq 1 ]; then
+        DEPLOY_MODE="手动强制部署"
+        CHANGELOG_CONTENT="📝 **最新版本信息**:\n"
+        LATEST_COMMIT=$(git log -3 --pretty=format:"%h %an - %s")
+        CHANGELOG_CONTENT+="> ${LATEST_COMMIT}\n\n"
+    else
+        CHANGELOG_CONTENT="📝 **变更内容**:\n"
+        COMMIT_LIST=$(git log --pretty=format:"%h %an - %s" --no-merges "${LOCAL_COMMIT}..${REMOTE_COMMIT}")
+        while IFS= read -r commit; do
+            CHANGELOG_CONTENT+="> ${commit}\n"
+        done <<< "$COMMIT_LIST"
+        CHANGELOG_CONTENT+="\n"
+    fi
+    NOTIFICATION_CONTENT=""
+    COMMIT_LIST=$(git log --pretty=format:"%h %an - %s" --no-merges "${LOCAL_COMMIT}..${REMOTE_COMMIT}")
+    NOTIFICATION_CONTENT+="✅ **自动化部署成功**\n"
+    NOTIFICATION_CONTENT+="**项目名称**: ${PROJECT_NAME}\n"
+    NOTIFICATION_CONTENT+="**代码分支**: ${RELEASE_BRANCH}\n"
+    NOTIFICATION_CONTENT+="**部署环境**: 测试环境\n"
+    NOTIFICATION_CONTENT+="**部署方式**: ${DEPLOY_MODE}\n"
+    NOTIFICATION_CONTENT+="**容器镜像**: ${DOCKER_IMAGE}\n"
+    NOTIFICATION_CONTENT+="**部署节点**: ${SERVER_HOST}\n"
+    NOTIFICATION_CONTENT+="**部署端口**: ${SERVER_PORT}\n"
+    NOTIFICATION_CONTENT+="**健康检查**: ${HEALTH_CHECK}\n"
+    NOTIFICATION_CONTENT+="**部署时间**: $(date +'%Y-%m-%d %H:%M:%S')\n\n"
+    
+    NOTIFICATION_CONTENT+="${CHANGELOG_CONTENT}"
+
+    NOTIFICATION_CONTENT+="🔗 **相关链接**:\n"
+    NOTIFICATION_CONTENT+="- [接口文档](${OPENAPI_URL})\n"
+    NOTIFICATION_CONTENT+="\n"
 
     # 发送企业微信通知
     send_notification "$NOTIFICATION_CONTENT"
