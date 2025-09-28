@@ -67,7 +67,7 @@ SERVER_PORT="8150"
 #DOCKER_IMAGE="${PROJECT_NAME}:1.0.0"
 CONFIG_FILE="config-prod.yaml"
 # 企微群机器人通知webhook地址
-QY_NOTIFY_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=013547da-3d78-4a7f-b4a7-e668b192c293"
+QY_NOTIFY_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a98cc573-9d3b-454b-84a5-9c281beffe24"
 
 # 接口文档地址
 OPENAPI_URL="http://${SERVER_HOST}:${SERVER_PORT}/docs"
