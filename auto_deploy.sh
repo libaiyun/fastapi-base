@@ -29,7 +29,7 @@ send_notification() {
 handle_error() {
     local error_msg="$1"
     log "错误：$error_msg"
-    send_notification "⚠️ **部署失败**: ${error_msg}\n**项目名称**: ${PROJECT_NAME}\n**代码分支**: ${RELEASE_BRANCH}\n**部署节点**: ${SERVER_HOST}"
+    send_notification "⚠️ **部署失败**: ${error_msg}\n**项目名称**: ${PROJECT_NAME}\n**代码分支**: ${DEPLOY_BRANCH}\n**部署节点**: ${SERVER_HOST}"
     exit 1
 }
 
@@ -57,7 +57,7 @@ ORIGINAL_REPO_URL="http://192.168.30.28/framework/fastapi-base.git"
 GIT_USER="cqvipcq%40outlook.com"
 GIT_PASSWD="Cqvip.com"
 # 用于部署的分支名
-RELEASE_BRANCH="release/1.0.0"
+DEPLOY_BRANCH="master"
 # 服务名
 PROJECT_NAME="fastapi-base"
 # 脚本的工作目录
@@ -98,28 +98,28 @@ trap 'git remote set-url origin "$ORIGINAL_REPO_URL"' EXIT
 
 # 检查当前分支
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$CURRENT_BRANCH" != "$RELEASE_BRANCH" ]; then
-    log "当前分支是 $CURRENT_BRANCH, 正在切换到 $RELEASE_BRANCH"
-    git checkout "$RELEASE_BRANCH" || handle_error "切换分支失败"
+if [ "$CURRENT_BRANCH" != "$DEPLOY_BRANCH" ]; then
+    log "当前分支是 $CURRENT_BRANCH, 正在切换到 $DEPLOY_BRANCH"
+    git checkout "$DEPLOY_BRANCH" || handle_error "切换分支失败"
 fi
 
 # 更新远程仓库信息
 git fetch origin || handle_error "fetch 失败"
 
-LOCAL_COMMIT=$(git rev-parse "$RELEASE_BRANCH")
-REMOTE_COMMIT=$(git rev-parse "origin/$RELEASE_BRANCH")
+LOCAL_COMMIT=$(git rev-parse "$DEPLOY_BRANCH")
+REMOTE_COMMIT=$(git rev-parse "origin/$DEPLOY_BRANCH")
 
 # 添加强制部署逻辑
 if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     if [ "$FORCE_DEPLOY" -eq 1 ]; then
         log "执行强制部署"
         # 强制更新代码
-        git reset --hard "origin/$RELEASE_BRANCH" || handle_error "强制重置分支失败"
+        git reset --hard "origin/$DEPLOY_BRANCH" || handle_error "强制重置分支失败"
         log "当前代码版本：$(git rev-parse --short HEAD)"
     else
         log "检测到代码更新，开始持续部署流程..."
         # 拉取最新更新
-        git pull origin "$RELEASE_BRANCH" || handle_error "pull 失败"
+        git pull origin "$DEPLOY_BRANCH" || handle_error "pull 失败"
         log "此次更新的 commit 列表:"
         git log --oneline "$LOCAL_COMMIT..$REMOTE_COMMIT"
     fi
@@ -196,7 +196,7 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     COMMIT_LIST=$(git log --pretty=format:"%h %an - %s" --no-merges "${LOCAL_COMMIT}..${REMOTE_COMMIT}")
     NOTIFICATION_CONTENT+="✅ **自动化部署成功**\n"
     NOTIFICATION_CONTENT+="**项目名称**: ${PROJECT_NAME}\n"
-    NOTIFICATION_CONTENT+="**代码分支**: ${RELEASE_BRANCH}\n"
+    NOTIFICATION_CONTENT+="**代码分支**: ${DEPLOY_BRANCH}\n"
     NOTIFICATION_CONTENT+="**部署环境**: 测试环境\n"
     NOTIFICATION_CONTENT+="**部署方式**: ${DEPLOY_MODE}\n"
     NOTIFICATION_CONTENT+="**容器镜像**: ${DOCKER_IMAGE}\n"
