@@ -9,11 +9,9 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.api.deps.oauth2 import oauth2_scheme, get_signature
-from app.config.conf.mongo_conf import get_mongo_uri, mongo_uri_changed
 from app.core.log import LOGGING_CONFIG
 from app.core.middleware import register_middlewares
 from app.core.nacos.discovery import service_discovery
-from app.db.mongo_init import close_mongo, init_mongo
 from app.exceptions import register_exception_handlers, RemoteServiceException
 from app.core.make_api_offline import make_api_offline
 from app.api.v1.router import router as api_v1
@@ -38,16 +36,16 @@ async def lifespan(_app: FastAPI):
             await service_discovery.init()
             start_sw_agent()
 
-            await dynamic_config_manager.register(
-                "mongo_uri", getter=get_mongo_uri, callback=mongo_uri_changed, interval=10
-            )
-            await dynamic_config_manager.start()
+            # await dynamic_config_manager.register(
+            #     "mongo_uri", getter=get_mongo_uri, callback=mongo_uri_changed, interval=10
+            # )
+            # await dynamic_config_manager.start()
 
-            await init_mongo(mongo_uri=dynamic_config_manager.get_config("mongo_uri"))
+            # await init_mongo(mongo_uri=dynamic_config_manager.get_config("mongo_uri"))
             yield
         finally:
-            close_mongo()
-            await dynamic_config_manager.stop()
+            # close_mongo()
+            # await dynamic_config_manager.stop()
             await service_discovery.shutdown()
 
 
