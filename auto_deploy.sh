@@ -60,15 +60,21 @@ GIT_PASSWD="Cqvip.com"
 DEPLOY_BRANCH="master"
 # 服务名
 PROJECT_NAME="fastapi-base"
-# 脚本的工作目录
-WORK_DIR="/data/projects/$PROJECT_NAME"
-SERVER_HOST=$(get_local_ip "192.168")
+# 部署和映射端口
 SERVER_PORT="8001"
-#DOCKER_IMAGE="${PROJECT_NAME}:1.0.0"
-CONFIG_FILE="config-prod.yaml"
+# 部署环境 test/prod
+APP_ENV="prod"
 # 企微群机器人通知webhook地址
 QY_NOTIFY_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a98cc573-9d3b-454b-84a5-9c281beffe24"
 
+# 如果不是生产环境，则添加环境后缀
+if [ "$APP_ENV" != "prod" ]; then
+  PROJECT_NAME="${PROJECT_NAME}-${APP_ENV}"
+fi
+# 脚本的工作目录
+WORK_DIR="/data/projects/$PROJECT_NAME"
+SERVER_HOST=$(get_local_ip "192.168")
+CONFIG_FILE="config-${APP_ENV}.yaml"
 # 接口文档地址
 OPENAPI_URL="http://${SERVER_HOST}:${SERVER_PORT}/docs"
 # 远程仓库地址（带用户名和密码）
@@ -155,10 +161,10 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
         --name "$PROJECT_NAME" \
         --restart unless-stopped \
         -p "${SERVER_PORT}:${SERVER_PORT}" \
-        -e APP_ENV=prod \
+        -e APP_ENV="$APP_ENV" \
         -e SERVER_HOST="${SERVER_HOST:-0.0.0.0}" \
         -e SERVER_PORT="${SERVER_PORT}" \
-        -v "$(pwd)/$CONFIG_FILE:/app/config-prod.yaml" \
+        -v "$(pwd)/$CONFIG_FILE:/app/$CONFIG_FILE" \
         -v "$(pwd)/log:/app/log" \
         "$DOCKER_IMAGE" || {
             log "容器启动失败"
@@ -168,13 +174,18 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     # 等待应用启动
     log "等待应用启动"
-    sleep 5
-    # 检查应用健康状态
-    if curl -s "http://${SERVER_HOST}:${SERVER_PORT}/health" >/dev/null 2>&1; then
-        HEALTH_CHECK="✅ 通过"
-    else
-        HEALTH_CHECK="⚠️ 失败(接口可能尚未就绪)"
-    fi
+    MAX_RETRIES=15
+    SLEEP_INTERVAL=3
+    for i in $(seq 1 $MAX_RETRIES); do
+        if curl -s "http://${SERVER_HOST}:${SERVER_PORT}/health" >/dev/null 2>&1; then
+            HEALTH_CHECK="✅ 通过"
+            break
+        else
+            echo "第 $i 次检查失败，等待 $SLEEP_INTERVAL 秒..."
+        fi
+        sleep $SLEEP_INTERVAL
+    done
+    [[ -z "$HEALTH_CHECK" ]] && HEALTH_CHECK="⚠️ 失败(接口可能尚未就绪)"
 
     # 生成变更报告
     DEPLOY_MODE="自动触发"
@@ -197,7 +208,7 @@ if [ "$FORCE_DEPLOY" -eq 1 ] || [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     NOTIFICATION_CONTENT+="✅ **自动化部署成功**\n"
     NOTIFICATION_CONTENT+="**项目名称**: ${PROJECT_NAME}\n"
     NOTIFICATION_CONTENT+="**代码分支**: ${DEPLOY_BRANCH}\n"
-    NOTIFICATION_CONTENT+="**部署环境**: 测试环境\n"
+    NOTIFICATION_CONTENT+="**部署环境**: ${APP_ENV}\n"
     NOTIFICATION_CONTENT+="**部署方式**: ${DEPLOY_MODE}\n"
     NOTIFICATION_CONTENT+="**容器镜像**: ${DOCKER_IMAGE}\n"
     NOTIFICATION_CONTENT+="**部署节点**: ${SERVER_HOST}\n"
