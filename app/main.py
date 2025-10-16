@@ -53,9 +53,11 @@ servers = None
 dependencies = [
     Depends(get_signature),
 ]
+root_path = f"/{config.service_name}"
 if config.enable_oauth2:
     servers = [{"url": config.gateway.service_url, "description": "正式环境"}]
     dependencies.append(Depends(oauth2_scheme))
+    root_path = ""
 app = FastAPI(
     title="基于FastAPI的Python服务基础框架",
     description="基于FastAPI的Python服务基础框架，"
@@ -64,7 +66,7 @@ app = FastAPI(
     servers=servers,
     dependencies=dependencies,
     lifespan=lifespan,
-    root_path=f"/{config.service_name}",
+    root_path=root_path,
 )
 
 make_api_offline(app)
