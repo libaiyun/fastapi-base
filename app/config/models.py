@@ -98,6 +98,8 @@ class NacosConfig(BaseModel):
     @field_validator("cache_dir", mode="after")
     def ensure_cache_path_exists(cls, v: Path):
         v.mkdir(parents=True, exist_ok=True)
+        naming_public = v / "naming" / "public"
+        naming_public.mkdir(parents=True, exist_ok=True)
         return v
 
     @model_validator(mode="after")
