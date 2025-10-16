@@ -100,6 +100,13 @@ class NacosConfig(BaseModel):
         v.mkdir(parents=True, exist_ok=True)
         return v
 
+    @model_validator(mode="after")
+    def clear_auth_if_disabled(self):
+        if self.auth_enabled is False:
+            self.username = ""
+            self.password = ""
+        return self
+
 
 class GatewayConfig(BaseModel):
     login_url: str
