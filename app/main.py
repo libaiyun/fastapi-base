@@ -6,7 +6,6 @@ import sentry_sdk
 from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 
 from app.api.deps.oauth2 import oauth2_scheme, get_signature
 from app.core.log import LOGGING_CONFIG
@@ -16,6 +15,7 @@ from app.exceptions import register_exception_handlers, RemoteServiceException
 from app.core.make_api_offline import make_api_offline
 from app.api.v1.router import router as api_v1
 from app.schemas.error_report import ErrorReport
+from app.schemas.response import APIResponse
 from app.schemas.token import Token
 from app.config import config, APP_ENV
 from app.config.dynamic_config import dynamic_config_manager
@@ -87,24 +87,24 @@ app.include_router(api_v1, prefix="/api/v1")
 
 @app.get("/")
 async def root():
-    return {"code": 200, "message": "Hello World", "data": None}
+    return APIResponse(message="Hello, world!")
 
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return APIResponse(data={"status": "healthy"})
 
 
 if config.debug:
 
     @app.get("/config_info")
     async def get_config_info():
-        return config.model_dump(mode="json")
+        return APIResponse(data=config.model_dump(mode="json"))
 
     @app.get("/dynamic-configs")
     async def list_dynamic_configs():
         """列出所有动态配置"""
-        return dynamic_config_manager.current_values
+        return APIResponse(data=dynamic_config_manager.current_values)
 
 
 if config.enable_oauth2:
@@ -154,8 +154,7 @@ if config.sentry.enabled:
                     extras={"stack_trace": error_report.stack_trace},
                 )
 
-            return JSONResponse(content={"message": "Error reported successfully"}, status_code=200)
+            return APIResponse(message="Error reported successfully")
 
         except Exception as e:
-            logger.exception("Error while reporting to Sentry")
             raise RemoteServiceException(f"Failed to report error: {str(e)}")
